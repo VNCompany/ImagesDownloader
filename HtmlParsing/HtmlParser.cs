@@ -1,219 +1,132 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace HtmlParsing
 {
     public class HtmlParser
     {
-        public struct TagInfo
+        private enum TagType : byte { StartTag = 1, EndTag = 2, Invalid = 4 }
+        private ref struct TagFrame
         {
-            public int Position { get; set; } = -1;
-            public int Length { get; set; } = 0;
-            public string Name { get; set; } = string.Empty;
-            public bool IsClosingTag { get; set; } = false;
-
-            public TagInfo(int position, int length, string name, bool isClosingTag)
-            {
-                Position = position;
-                Length = length;
-                Name = name;
-                IsClosingTag = isClosingTag;
-            }
+            public TagFrame() { }
+            public TagType Type = TagType.Invalid;
+            public int Start = -1;
+            public int Length = 0;
         }
         
-        private readonly StringPart html;
+        private readonly string html;
+        private readonly List<HtmlTag> tags;
 
-        private HtmlParser(StringPart html)
+        public IList<HtmlTag> Tags => tags;
+
+        public HtmlParser(string html, bool onlyHead = false)
         {
+            tags = new List<HtmlTag>();
             this.html = html;
+            
+            LoadTags(onlyHead);
         }
 
-        private static bool IsQuoteSign(char ch) => ch == '"' || ch == '\'';
-        
-        /// <summary>
-        /// Get tag position 
-        /// </summary>
-        /// <param name="content">html text</param>
-        /// <param name="tag">lower-case tag name</param>
-        /// <returns>Start tag position with sign, returns -1 if not found</returns>
-        public static int FindTag(ReadOnlySpan<char> content, string tag)
+        private void LoadTags(bool onlyHead)
         {
-            int i = 0;
-            while (i < content.Length)
+            int ptr = 0;
+            bool stop = false;
+            while (ptr < html.Length && stop == false)
             {
-                switch (content[i])
+                var tagFrame = ParseTagFrame(html, ptr);
+
+                switch (tagFrame.Type)
                 {
-                    case '"':
-                    case '\'':
-                        i++;
-                        while (i < content.Length && !IsQuoteSign(content[i]))
-                            i++;
-                        i++;
+                    case TagType.StartTag:
+                    {
+                        TagSchema tagSchema = new TagSchema(html, tagFrame.Start, tagFrame.Length);
+                        tags.Add(new HtmlTag(tagSchema, tagSchema.GetNameSpan().ToString().ToLower()));
+                        ptr = tagSchema.Start + tagSchema.Length;
+                    }
                         break;
 
-                    case '<':
+                    case TagType.EndTag:
                     {
-                        i++;
-                        int j = 0;
-                        while (j < tag.Length && i < content.Length)
+                        TagSchema tagSchema = new TagSchema(html, tagFrame.Start, tagFrame.Length, 1);
+                        int startTagIndex = tags.FindLastIndex(tag => tag.Schema.NameEquals(tagSchema.GetNameSpan()));
+                        if (startTagIndex != -1)
                         {
-                            if (tag[j] != content[i]
-                                && tag[j] != char.ToLower(content[i]))
-                                break;
-                            i++; j++;
+                            var startTag = tags[startTagIndex];
+
+                            for (int i = startTagIndex + 1; i < tags.Count; i++)
+                            {
+                                var subTag = tags[i];
+                                subTag.Parent ??= startTag;
+                            }
+
+                            int contentStart = startTag.Schema.Start + startTag.Schema.Length;
+                            int contentLength = tagSchema.Start - contentStart;
+
+                            if (contentLength > 0)
+                                startTag.Content = new HtmlContent(html, contentStart, contentLength);
+
+                            if (onlyHead && startTag.Name.Equals("head"))
+                                stop = true;
                         }
-
-                        if (j == tag.Length)
-                            return i - j - 1;
+                        
+                        ptr = tagSchema.Start + tagSchema.Length;
                     }
                         break;
-                    
+
+                    case TagType.Invalid:
                     default:
-                        i++;
-                        break;
+                        ptr++;
+                        continue;
                 }
             }
-
-            return -1;
-        }
-        
-        /// <param name="htmlPart"></param>
-        /// <param name="tagBody">tag body without frames</param>
-        /// <returns>true if found</returns>
-        public static bool GetTagBody(StringPart htmlPart, [NotNullWhen(true)] out StringPart? tagBody)
-        {
-            bool ignore = false;
-            int start = -1;
-
-            for (int i = 0; i < htmlPart.Length; i++)
-            {
-                if (IsQuoteSign(htmlPart[i])) ignore = !ignore;
-
-                if (!ignore && htmlPart[i] == '<')
-                {
-                    start = i + 1;
-                    break;
-                }
-            }
-
-            if (start != -1 && start < htmlPart.Length)
-            {
-                for (int i = start + 1; i < htmlPart.Length; i++)
-                {
-                    if (IsQuoteSign(htmlPart[i])) ignore = !ignore;
-
-                    if (!ignore && htmlPart[i] == '>')
-                    {
-                        tagBody = htmlPart.Slice(start, i - start);
-                        return true;
-                    }
-                }
-
-                tagBody = htmlPart.Slice(start);
-                return true;
-            }
-
-            tagBody = null;
-            return false;
         }
 
-        public static StringPart? GetTagName(StringPart tagBody)
+        private static TagFrame ParseTagFrame(string html, int start)
         {
-            if (tagBody.Length == 0) return null;
-
-            int i = 0;
-            while (i < tagBody.Length 
-                   && tagBody[i] != '/' 
-                   && char.IsWhiteSpace(tagBody[i]) == false)
-                i++;
-
-            return i == 0 ? null : tagBody.Slice(0, i);
-        }
-
-        /// <summary>
-        /// Get tag info
-        /// </summary>
-        /// <param name="content">html text</param>
-        /// <returns>tag info</returns>
-        public static TagInfo GetTag(ReadOnlySpan<char> content)
-        {
-            int i = 0;
-            int start = -1;
-            int end = -1;
-            bool quote = false;
-            
-            // Search tag start
-            while (i < content.Length)
+            int ptr = start;
+            while (ptr < html.Length)
             {
-                if (IsQuoteSign(content[i]))
+                if (html[ptr] == '<' && ptr + 2 < html.Length)
                 {
-                    quote = !quote;
-                    i++;
-                    continue;
-                }
-
-                if (!quote && content[i] == '<')
-                {
-                    start = i;
-                    i++;
-                    break;
-                }
-            }
-            
-            // Parse tag name
-            if (start != -1 && i + 2 < content.Length)
-            {
-                TagInfo ti = new TagInfo()
-                {
-                    Position = start
-                };
-                
-                // Iterating tag name
-                if (content[i + 1] == '/')
-                {
-                    i++;
-                    ti.IsClosingTag = true;
-                }
-                
-                while (i < content.Length
-                       && content[i] != '>'
-                       && content[i] != '/'
-                       && !char.IsWhiteSpace(content[i]))
-                    i++;
-                ti.Name = content.Slice(start + 1, i - start - 1).ToString();
-
-                while (true)
-                {
-                    if (i == content.Length)
+                    start = ptr++;
+                    
+                    if (html[ptr] == '!')
                     {
-                        ti.Length = content.Length - start;
-                        break;
-                    }
-
-                    if (IsQuoteSign(content[i])) quote = !quote;
-
-                    if (!quote && content[i] == '>')
-                    {
-                        ti.Length = i - start + 1;
-                        break;
+                        ptr = ParserExtensions.SkipComment(html, ptr);
+                        continue;
                     }
                     
-                    i++;
-                }
-
-                return ti;
+                    TagType tagType = ParserExtensions.IsAsciiAlphaNumerics(html[ptr])
+                        ? TagType.StartTag
+                        : html[ptr] switch
+                        {
+                            '/' => TagType.EndTag,
+                            _ => TagType.Invalid
+                        };
+                    
+                    if ((byte)tagType < 4)
+                    {
+                        var tagNative = new TagFrame { Type = tagType, Start = start};
+                        for (; ptr < html.Length; ptr++)
+                        {
+                            if (html[ptr] == '\\')
+                                ptr++;
+                            else if (ParserExtensions.IsQuote(html, ptr, 0, out int skipLength))
+                                ptr += skipLength;
+                            else if (html[ptr] == '>')
+                            {
+                                tagNative.Length = ptr - start + 1;
+                                return tagNative;
+                            }
+                        }
+                    }
+                } 
+                
+                ptr++;
             }
-            return default;
-        }
 
-        // public static HtmlParser? ParseHead(string html)
-        // {
-        //     
-        // }
-        //
-        // public static HtmlParser? ParseBody(string html)
-        // {
-        //     
-        // }
+            return new() { Type = TagType.Invalid, Start = -1, Length = 0};
+        }
     }
 }
