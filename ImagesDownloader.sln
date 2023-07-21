@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HtmlParsing", "HtmlParsing\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{0A52EF56-5A0E-42E0-9A4D-A781536BB871}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BanchTest", "BanchTest\BanchTest.csproj", "{49821D1E-95FA-40C3-BD5A-14E28C0DB34F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{0A52EF56-5A0E-42E0-9A4D-A781536BB871}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0A52EF56-5A0E-42E0-9A4D-A781536BB871}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0A52EF56-5A0E-42E0-9A4D-A781536BB871}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49821D1E-95FA-40C3-BD5A-14E28C0DB34F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49821D1E-95FA-40C3-BD5A-14E28C0DB34F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49821D1E-95FA-40C3-BD5A-14E28C0DB34F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49821D1E-95FA-40C3-BD5A-14E28C0DB34F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
