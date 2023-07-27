@@ -4,27 +4,15 @@ using System.Runtime.CompilerServices;
 
 namespace HtmlParsing.Internal
 {
-    public struct TagResult
-    {
-        public bool Success { get; }
-        public StringRange Range { get; }
-
-        public TagResult(bool success, StringRange range)
-        {
-            Success = success;
-            Range = range;
-        }
-    }
-    
     public class HtmlReader
     {
         private readonly string _html;
         private int _pos;
 
-        public char this[int index]
+        public string Content
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => _html[index];
+            get => _html;
         }
 
         public HtmlReader(string html)
@@ -72,9 +60,10 @@ namespace HtmlParsing.Internal
             return -1;
         }
         
-        /// <returns>(bool Success, StringRange)</returns>
-        public TagResult GetTag()
+        public bool ReadTag(out StringRange tagRange)
         {
+            tagRange = default;
+            
             while (_pos < _html.Length 
                    && (_pos = _html.IndexOf('<', _pos)) != -1
                    && _pos + 2 < _html.Length)
@@ -86,15 +75,17 @@ namespace HtmlParsing.Internal
                     continue;
                 }
 
+                int startTagIndex = _pos;
                 int closeTagIndex = IndexOfWithIgnoreQuotes('>', _pos + 1);
+                
                 if (closeTagIndex == -1) break;
-
-                int startIndex = _pos;
                 _pos = closeTagIndex + 1;
-                return new TagResult(true, new StringRange(startIndex, closeTagIndex - startIndex + 1));
+
+                tagRange.Start = startTagIndex;
+                tagRange.Length = closeTagIndex - startTagIndex + 1;
+                return true;
             }
-            
-            return default;
+            return false;
         }
 
         public StringRange GetTagName(StringRange tagRange, bool isCloseTag)
@@ -111,11 +102,11 @@ namespace HtmlParsing.Internal
 
             return default;
         }
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public string GetString(StringRange range) => _html.Substring(range.Start, range.Length);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override string ToString() => _html;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public string ToString(StringRange range) => _html.Substring(range.Start, range.Length);
     }
 }

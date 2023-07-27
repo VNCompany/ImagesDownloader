@@ -19,6 +19,14 @@ namespace HtmlParsing.Internal
             return new StringRange(newStart, range.Length - offset);
         }
 
+        public static StringRange operator -(StringRange left, StringRange right)
+        {
+            StringRange newRange = default;
+            newRange.Start = (int)right;
+            newRange.Length = left.Start - newRange.Start;
+            return newRange;
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static explicit operator int(StringRange range) => range.Start + range.Length;
     }
