@@ -1,0 +1,24 @@
+            tagRange = default;
+            
+            while (_pos < _html.Length 
+                   && (_pos = _html.IndexOf('<', _pos)) != -1
+                   && _pos + 2 < _html.Length)
+            {
+                if (_html[_pos + 1] == '!')
+                {
+                    SkipMeta();
+                    _pos++;
+                    continue;
+                }
+
+                int startTagIndex = _pos;
+                int closeTagIndex = IndexOfWithIgnoreQuotes('>', _pos + 1);
+                
+                if (closeTagIndex == -1) break;
+                _pos = closeTagIndex + 1;
+
+                tagRange.Start = startTagIndex;
+                tagRange.Length = closeTagIndex - startTagIndex + 1;
+                return true;
+            }
+            return false;

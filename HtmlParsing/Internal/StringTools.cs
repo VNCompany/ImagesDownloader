@@ -14,12 +14,17 @@ namespace HtmlParsing.Internal
             {
                 if (CharsEquals(content[i], value[0], ignoreCase))
                 {
-                    int match = value.Length - 1;
-                    for (int c = i + 1, v = 1; c < content.Length && v < value.Length; c++, v++)
-                        if (CharsEquals(content[c], value[v], ignoreCase))
-                            match--;
+                    int contentIndex = i + 1;
+                    int valueIndex = 1;
+                    while (contentIndex < content.Length
+                           && valueIndex < value.Length
+                           && CharsEquals(content[contentIndex], value[valueIndex], ignoreCase))
+                    {
+                        contentIndex++;
+                        valueIndex++;
+                    }
 
-                    if (match == 0)
+                    if (valueIndex == value.Length)
                         return i;
                 }
             }
@@ -29,15 +34,15 @@ namespace HtmlParsing.Internal
 
         public static bool Equals(string content, string value, StringRange range, bool ignoreCase)
         {
-            if (range.Length != value.Length || (int)range > content.Length) 
+            if ((int)range >= content.Length)
                 return false;
 
-            for (int i = 0; i < range.Length; i++)
+            for (int i = 0; i != range.Length; i++)
                 if (CharsEquals(content[range.Start + i], value[i], ignoreCase) == false)
                     return false;
             return true;
         }
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsQuoteChar(char ch) => ch == '"' || ch == '\'';
 

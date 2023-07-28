@@ -1,14 +1,27 @@
 using System.IO;
-using System.Collections.Generic;
 
 using HtmlParsing.Internal;
 
-public class Tests
+namespace Tests
 {
-    [Test]
-    public void Test1()
+    public class Tests
     {
-        var list = new List<int>();
+        private void PrintTag(HtmlReader reader, TagInfo tagInfo)
+        {
+            Console.Write($"{reader.GetString(tagInfo.NameRange)} {reader.GetString(tagInfo.Range)}");
+            if (tagInfo.IsCloseTag)
+                Console.WriteLine(" - close tag");
+            else
+                Console.WriteLine();
+        }
+
+        [Test]
+        public void Test1()
+        {
+            HtmlReader reader = new HtmlReader(File.ReadAllText(@"E:\Projects\ImagesDownloader\Tests\test.small2.html"));
+        
+            while (reader.ReadTag(out TagInfo tagInfo))
+                PrintTag(reader, tagInfo);
+        }
     }
 }
-
