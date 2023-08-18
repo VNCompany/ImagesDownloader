@@ -77,6 +77,22 @@ namespace HtmlParsing
         }
 
         public bool HasClass(string name) => HasClasses(new[] { name });
+
+        public IEnumerable<HtmlNode> GetByClassNames(IEnumerable<string> names)
+        {
+            IList<string> classNames = names as IList<string> ?? names.ToArray();
+            if (Childs?.Count > 0 && classNames.Count > 0)
+            {
+                for (int i = Schema.Index + 1; i != Schema.LastIndex; i++)
+                {
+                    HtmlNode node = _parser.Nodes[i];
+                    if (node.HasClasses(classNames))
+                        yield return node;
+                }
+            }
+        }
+
+        public IEnumerable<HtmlNode> GetByClassName(string name) => GetByClassNames(new[] { name });
     }
 }
 

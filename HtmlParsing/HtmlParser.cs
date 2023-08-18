@@ -75,7 +75,8 @@ namespace HtmlParsing
                         HtmlNode node = _nodes[startNodeIndex];
                         node.Schema.LastIndex = _nodes.Count - 1;
                         node.Content = new HtmlValue(html, tagInfo.Range - node.Schema.Range);
-                        node.Childs = new HtmlNodesCollection(_nodes, node, node.Schema.Index, node.Schema.LastIndex);
+                        node.Childs = new HtmlNodesCollection(_nodes, node, node.Schema.Index + 1,
+                            node.Schema.LastIndex);
                         
                         // Всем дочерним элементам узла указываем их родителя
                         for (int i = startNodeIndex + 1; i != _nodes.Count; i++)
