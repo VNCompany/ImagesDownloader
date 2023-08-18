@@ -8,9 +8,9 @@ namespace HtmlParsing
         private readonly string _content;
         private readonly StringRange _range;
         
-        private string _cached;
+        private string? _cached;
 
-        public HtmlValue(string content, StringRange range)
+        internal HtmlValue(string content, StringRange range)
         {
             _content = content;
             _range = range;
@@ -18,7 +18,7 @@ namespace HtmlParsing
 
         public HtmlValue(string content)
         {
-            _cached = content;
+            _cached = _content = content;
         }
 
         public string Value
@@ -31,6 +31,8 @@ namespace HtmlParsing
                 return _cached;
             }
         }
+
+        public int Length => _range.Length;
 
         public ReadOnlySpan<char> AsSpan() => _cached ?? _content.AsSpan(_range.Start, _range.Length);
         

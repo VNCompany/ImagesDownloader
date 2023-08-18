@@ -1,6 +1,6 @@
 namespace HtmlParsing.Internal
 {
-    public class TagInfo
+    internal class TagInfo
     {
         public StringRange Range;
         public StringRange NameRange;

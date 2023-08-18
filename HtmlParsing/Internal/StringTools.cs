@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 namespace HtmlParsing.Internal
@@ -51,5 +52,23 @@ namespace HtmlParsing.Internal
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsAsciiAlphaOrDigitChar(char ch) => IsAsciiAlphaChar(ch) || (ch >= '0' && ch <= '9');
+
+        public static IEnumerable<string> SpaceSplit(string input)
+        {
+            int i = 0;
+            while (i < input.Length)
+            {
+                if (!char.IsWhiteSpace(input[i]))
+                {
+                    int j = i;
+                    while (j < input.Length && !char.IsWhiteSpace(input[j]))
+                        j++;
+                    yield return input.Substring(i, j - i);
+                    i = j;
+                }
+                else
+                    i++;
+            }
+        }
     }
 }

@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 
 namespace HtmlParsing.Internal
 {
-    public struct StringRange
+    internal struct StringRange
     {
         public int Start = -1;
         public int Length = 0;
@@ -29,5 +29,8 @@ namespace HtmlParsing.Internal
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static explicit operator int(StringRange range) => range.Start + range.Length;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override string ToString() => $"{{Start={Start},Length={Length}}}";
     }
 }

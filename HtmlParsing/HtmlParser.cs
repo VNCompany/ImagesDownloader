@@ -1,28 +1,42 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
 
 using HtmlParsing.Internal;
-// ReSharper disable All
 
 namespace HtmlParsing
 {
     public class HtmlParser
     {
+        private readonly string _html;
         private readonly HtmlReader _reader;
-        private readonly Dictionary<string, HtmlNode> _ids;
+        private readonly Dictionary<string, HtmlNode>? _ids;
         private readonly List<HtmlNode> _nodes;
 
-        public string Content => _reader.Content;
+        internal IEnumerable<KeyValuePair<string, StringRange>> GetNodeAttributes(HtmlNode node)
+            => _reader.ReadTagAttributes(node.Schema.Range, node.Name.Length)
+                .Select(attr =>
+                    new KeyValuePair<string, StringRange>(_reader.GetString(attr.Key).ToLower(), attr.Value));
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal HtmlValue BuildHtmlValue(StringRange range)
+            => new HtmlValue(_html, range);
 
         public IReadOnlyList<HtmlNode> Nodes => _nodes;
 
-        public HtmlNode Head { get; }
-        public HtmlNode Body { get; }
+        public HtmlNode Head { get; } = null!;
+        public HtmlNode Body { get; } = null!;
         
-        public HtmlParser(string html, bool loadAttributes = true)
+        public HtmlParser(string html, bool lazyLoad = false)
         {
+            if (string.IsNullOrEmpty(html))
+                throw new ArgumentNullException(nameof(html));
+            
+            _html = html;
             _reader = new HtmlReader(html);
             _nodes = new List<HtmlNode>();
-            _ids = loadAttributes ? new Dictionary<string, HtmlNode>() : new Dictionary<string, HtmlNode>(0);
+            _ids = !lazyLoad ? new Dictionary<string, HtmlNode>() : null;
             
             while (_reader.ReadTag(out TagInfo tagInfo))
             {
@@ -40,6 +54,15 @@ namespace HtmlParsing
                     
                     if (Head == null && tagName == "head") Head = htmlNode;
                     else if (Body == null && tagName == "body") Body = htmlNode;
+
+                    if (_ids != null)
+                    {
+                        if (htmlNode.TryGetAttribute("id", out HtmlValue? idAttr))
+                        {
+                            htmlNode.Id = idAttr.Value;
+                            _ids[htmlNode.Id] = htmlNode;
+                        }
+                    }
                 }
                 else
                 {
@@ -51,7 +74,8 @@ namespace HtmlParsing
                         // родителю последний дочерний индекс и диапазон строки с телом узла
                         HtmlNode node = _nodes[startNodeIndex];
                         node.Schema.LastIndex = _nodes.Count - 1;
-                        node.Content = new HtmlValue(_reader.Content, tagInfo.Range - node.Schema.Range);
+                        node.Content = new HtmlValue(html, tagInfo.Range - node.Schema.Range);
+                        node.Childs = new HtmlNodesCollection(_nodes, node, node.Schema.Index, node.Schema.LastIndex);
                         
                         // Всем дочерним элементам узла указываем их родителя
                         for (int i = startNodeIndex + 1; i != _nodes.Count; i++)
@@ -60,6 +84,16 @@ namespace HtmlParsing
                     }
                 }
             }
+        }
+
+        public HtmlNode? GetElementById(string name)
+        {
+            if (_ids == null)
+                throw new NotSupportedException("Enabled lazy loading mode");
+            
+            if (_ids.TryGetValue(name, out HtmlNode? node))
+                return node;
+            return null;
         }
     }
 }

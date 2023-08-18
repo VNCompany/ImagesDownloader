@@ -1,10 +1,11 @@
-using System;
-using System.Runtime;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+
+#nullable disable
 
 namespace HtmlParsing.Internal
 {
-    public class HtmlReader
+    internal class HtmlReader
     {
         private readonly string _html;
         private int _pos;
@@ -22,11 +23,13 @@ namespace HtmlParsing.Internal
             else
                 _pos = index + 1;
         }
-        
-        private int GoToEndQuote(int startIndex)
+
+        private int GoToEndQuote(int startIndex, int length = 0)
         {
+            length = length == 0 ? _html.Length : startIndex + length;
+            
             char ch = _html[startIndex++];
-            while (startIndex < _html.Length && _html[startIndex] != ch)
+            while (startIndex < length && _html[startIndex] != ch)
                 startIndex++;
             return startIndex;
         }
@@ -50,11 +53,12 @@ namespace HtmlParsing.Internal
             // Получение тела тега
             tagRange = isCloseTag ? tagRange >> 2 : tagRange >> 1;
             tagRange.Length--;
-            
+
+            int length = (int)tagRange;
             if (tagRange.Length > 0 && StringTools.IsAsciiAlphaChar(_html[tagRange.Start]))
             {
                 int index = tagRange.Start + 1;
-                while (index < (int)tagRange && StringTools.IsAsciiAlphaOrDigitChar(_html[index])) index++;
+                while (index < length && StringTools.IsAsciiAlphaOrDigitChar(_html[index])) index++;
                 return new StringRange(tagRange.Start, index - tagRange.Start);
             }
 
@@ -92,17 +96,8 @@ namespace HtmlParsing.Internal
             return new StringRange(_html.Length, 0);
         }
         
-        public string Content
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => _html;
-        }
-
         public HtmlReader(string html)
         {
-            if (string.IsNullOrEmpty(html))
-                throw new ArgumentException("html");
-
             _html = html;
             _pos = 0;
         }
@@ -150,6 +145,64 @@ namespace HtmlParsing.Internal
 
             tagInfo = null;
             return false;
+        }
+
+        public IReadOnlyList<KeyValuePair<StringRange, StringRange>> ReadTagAttributes(StringRange tagRange, int nameLength)
+        {
+            StringRange bodyRange = tagRange >> (1 + nameLength);
+            bodyRange.Length--;
+            var list = new List<KeyValuePair<StringRange, StringRange>>();
+
+            int i = bodyRange.Start;
+            int bodyLength = (int)bodyRange;
+            while (i < bodyLength)
+            {
+                if (StringTools.IsAsciiAlphaChar(_html[i]))
+                {
+                    int j = i + 1;
+                    int sep = 0;
+                    StringRange valueRange = new StringRange(-1, -1);
+                    while (j < bodyLength)
+                    {
+                        if (_html[j] == '=')
+                        {
+                            sep = j++;
+                            valueRange.Start = j;
+                        }
+                        else if (StringTools.IsQuoteChar(_html[j]) && sep == j - 1)
+                        {
+                            valueRange.Start++;
+                            j = GoToEndQuote(j, bodyRange.Length);
+                            valueRange.Length = j - valueRange.Start;
+                            break;
+                        }
+                        else if (!char.IsWhiteSpace(_html[j]))
+                            j++;
+                        else break;
+                    }
+
+                    StringRange keyRange = new StringRange(i, sep != 0 ? sep - i : j - i);
+
+                    if (valueRange.Length == -1)
+                    {
+                        if (sep == 0)
+                            list.Add(new KeyValuePair<StringRange, StringRange>(keyRange, keyRange));
+                        else
+                        {
+                            valueRange.Length = j - valueRange.Start;
+                            list.Add(new KeyValuePair<StringRange, StringRange>(keyRange, valueRange));
+                        }
+                    }
+                    else
+                        list.Add(new KeyValuePair<StringRange, StringRange>(keyRange, valueRange));
+
+                    i = j;
+                }
+
+                i++;
+            }
+
+            return list;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
