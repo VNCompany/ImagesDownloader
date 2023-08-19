@@ -28,7 +28,10 @@ namespace Tests
         public void Test1()
         {
             var reader = new HtmlParser(File.ReadAllText(@"E:\Projects\ImagesDownloader\Tests\test.small2.html"));
-            Console.WriteLine(reader.GetElementById("test").GetAttribute("data-text").Value);
+
+            var node = reader.GetElementById("test-id");
+            PrintNode(node);
+            Console.WriteLine(node?.Content?.Value);
         }
 
         [Test]

@@ -23,6 +23,7 @@ namespace HtmlParsing
             _parser = parser;
             Name = name;
             Schema = schema;
+            Schema.LastIndex = -1;
         }
 
         public string Name { get; }

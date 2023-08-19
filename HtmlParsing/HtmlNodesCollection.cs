@@ -64,7 +64,7 @@ namespace HtmlParsing
             public void Reset()
             {
                 _current = null;
-                _index = -1;
+                _index = 0;
             }
 
             void IDisposable.Dispose() => GC.SuppressFinalize(this);

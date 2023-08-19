@@ -67,7 +67,8 @@ namespace HtmlParsing
                 else
                 {
                     // Получение корневого узла
-                    int startNodeIndex = _nodes.FindLastIndex(node => node.Name == tagName);
+                    int startNodeIndex = _nodes.FindLastIndex(node => node.Name == tagName 
+                                                                      && node.Schema.LastIndex == -1);
                     if (startNodeIndex != -1 && _nodes.Count - startNodeIndex > 1)
                     {
                         // Если найден корневой узел, и есть дочерние узлы, то указываем
