@@ -4,8 +4,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HtmlParsing", "HtmlParsing\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{0A52EF56-5A0E-42E0-9A4D-A781536BB871}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleTests", "ConsoleTests\ConsoleTests.csproj", "{4C18E289-0D46-48C8-BB62-CD32F8CA7455}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,9 +18,5 @@ Global
 		{0A52EF56-5A0E-42E0-9A4D-A781536BB871}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0A52EF56-5A0E-42E0-9A4D-A781536BB871}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0A52EF56-5A0E-42E0-9A4D-A781536BB871}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4C18E289-0D46-48C8-BB62-CD32F8CA7455}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4C18E289-0D46-48C8-BB62-CD32F8CA7455}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4C18E289-0D46-48C8-BB62-CD32F8CA7455}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4C18E289-0D46-48C8-BB62-CD32F8CA7455}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
