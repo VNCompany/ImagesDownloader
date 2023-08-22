@@ -28,6 +28,12 @@ namespace HtmlParsing
         public HtmlNode Head { get; } = null!;
         public HtmlNode Body { get; } = null!;
         
+        /// <summary>
+        /// lxml parser for default HTML and HTML5
+        /// </summary>
+        /// <param name="html">HTML document</param>
+        /// <param name="lazyLoad">if true, the attributes of the elements will be loaded dynamically. Method GetElementById isn't available</param>
+        /// <exception cref="ArgumentNullException">argument html null or empty</exception>
         public HtmlParser(string html, bool lazyLoad = false)
         {
             if (string.IsNullOrEmpty(html))
@@ -69,25 +75,41 @@ namespace HtmlParsing
                     // Получение корневого узла
                     int startNodeIndex = _nodes.FindLastIndex(node => node.Name == tagName 
                                                                       && node.Schema.LastIndex == -1);
-                    if (startNodeIndex != -1 && _nodes.Count - startNodeIndex > 1)
+                    
+                    if (startNodeIndex != -1)
                     {
                         // Если найден корневой узел, и есть дочерние узлы, то указываем
                         // родителю последний дочерний индекс и диапазон строки с телом узла
                         HtmlNode node = _nodes[startNodeIndex];
                         node.Schema.LastIndex = _nodes.Count - 1;
                         node.Content = new HtmlValue(html, tagInfo.Range - node.Schema.Range);
-                        node.Childs = new HtmlNodesCollection(_nodes, node, node.Schema.Index + 1,
-                            node.Schema.LastIndex);
                         
-                        // Всем дочерним элементам узла указываем их родителя
-                        for (int i = startNodeIndex + 1; i != _nodes.Count; i++)
-                            if (_nodes[i].Parent == null)
-                                _nodes[i].Parent = node;
+                        // Есть ли дочерние элементы
+                        if (_nodes.Count - startNodeIndex > 1)
+                        {
+                            startNodeIndex += 1;
+                    
+                            // Всем дочерним элементам узла указываем их родителя
+                            for (int i = startNodeIndex; i != _nodes.Count; i++)
+                                if (_nodes[i].Parent == null)
+                                    _nodes[i].Parent = node;
+                    
+                            // Задать коллекцию дочерних элементов элементу
+                            node.Childs = new HtmlNodesCollection(_nodes, node, startNodeIndex,
+                                node.Schema.LastIndex);
+                        }
                     }
                 }
             }
         }
 
+        
+        /// <summary>
+        /// Gets element by id
+        /// </summary>
+        /// <param name="name">element id</param>
+        /// <returns>object of node, null if not found</returns>
+        /// <exception cref="NotSupportedException">enabled lazy loading mode</exception>
         public HtmlNode? GetElementById(string name)
         {
             if (_ids == null)

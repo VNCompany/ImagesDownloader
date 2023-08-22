@@ -16,6 +16,7 @@ namespace HtmlParsing
         {
             _nodes = nodes;
 
+            lastChildIndex += 1;
             List<int> temp = new List<int>();
             for (int i = firstChildIndex; i != lastChildIndex; ++i)
             {

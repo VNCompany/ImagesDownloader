@@ -5,33 +5,43 @@ namespace Tests
 {
     public class Tests
     {
-        private void PrintNode(HtmlNode? node)
+        private void PrintNode(HtmlNode? node, string prefix = "")
         {
-            Console.WriteLine("----------------");
             if (node is null)
             {
-                Console.WriteLine("NULL");
+                Console.WriteLine("<NULL>");
                 return;
             }
-
-            Console.WriteLine("Name: {0}", node.Name);
-            Console.WriteLine("Content size: {0}", node.Content?.Length ?? 0);
-            Console.WriteLine("Parent node name: {0}", node.Parent?.Name ?? "NULL");
-            Console.WriteLine("Childs count: {0}", node.Childs?.Count ?? 0);
-            Console.WriteLine("Attributes: {0}", string.Join(", ", node.Attributes));
             
-            Console.WriteLine("----------------");
-            Console.WriteLine();
+            Console.WriteLine("{4}<{0} AttributesCount='{1}' ChildsCount='{2}' ContentSize='{3}'>",
+                node.Name,
+                node.Attributes.Count,
+                node.Childs?.Count ?? 0,
+                node.Content?.Length,
+                prefix);
+        }
+
+        private void PrintAllNodes(IReadOnlyList<HtmlNode> allNodes, HtmlNode currentNode, int tab = 0)
+        {
+            PrintNode(currentNode, new string('\t', tab));
+
+            foreach (var htmlNode in allNodes.Where(n => n.Parent == currentNode))
+                PrintAllNodes(allNodes, htmlNode, tab + 1);
         }
         
         [Test]
         public void Test1()
         {
-            var reader = new HtmlParser(File.ReadAllText(@"E:\Projects\ImagesDownloader\Tests\test.small2.html"));
+            var reader = new HtmlParser(File.ReadAllText(@"E:\Projects\ImagesDownloader\Tests\test.html"));
 
-            var node = reader.GetElementById("test-id");
-            PrintNode(node);
-            Console.WriteLine(node?.Content?.Value);
+            var query = from lnk in
+                    (from container in reader.Body.GetByClassNames(new[] { "image-container", "column" })
+                        select container.GetByClassName("image").FirstOrDefault()?.GetAttribute("href"))
+                where lnk != null
+                select lnk;
+            
+            foreach (var imgLink in query.Take(10))
+                Console.WriteLine(imgLink);
         }
 
         [Test]
