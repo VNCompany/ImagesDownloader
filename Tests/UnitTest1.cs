@@ -1,6 +1,7 @@
 using HtmlParsing.Internal;
 using HtmlParsing;
 using XPathParsing;
+using HtmlParsing.XPathSelector;
 
 namespace Tests
 {

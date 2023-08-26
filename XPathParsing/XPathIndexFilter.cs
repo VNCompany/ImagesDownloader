@@ -1,6 +1,6 @@
 namespace XPathParsing
 {
-    public class XPathIndexFilter : IXPathFilter
+    public sealed class XPathIndexFilter : IXPathFilter
     {
         public int Index { get; }
 

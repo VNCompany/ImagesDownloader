@@ -83,6 +83,24 @@ namespace HtmlParsing
             => TryGetAttribute(name, out HtmlValue? result) ? result : null;
 
         /// <summary>
+        /// Get all nested elements
+        /// </summary>
+        /// <returns>collection of html nodes</returns>
+        public IEnumerable<HtmlNode> GetAllElements()
+        {
+            if (Childs?.Count > 0)
+                for (int i = Schema.Index + 1; i <= Schema.LastIndex; i++)
+                    yield return _parser.Nodes[i];
+        }
+
+        /// <summary>
+        /// Search through all nested elements
+        /// </summary>
+        /// <param name="predicate">predicate</param>
+        /// <returns>collection of html nodes</returns>
+        public IEnumerable<HtmlNode> Find(Func<HtmlNode, bool> predicate) => GetAllElements().Where(predicate);
+
+        /// <summary>
         /// Check for all element classes availability
         /// </summary>
         /// <param name="names">names of classes</param>
@@ -114,14 +132,9 @@ namespace HtmlParsing
         {
             IList<string> classNames = names as IList<string> ?? names.ToArray();
             if (Childs?.Count > 0 && classNames.Count > 0)
-            {
-                for (int i = Schema.Index + 1; i <= Schema.LastIndex; i++)
-                {
-                    HtmlNode node = _parser.Nodes[i];
-                    if (node.HasClasses(classNames))
-                        yield return node;
-                }
-            }
+                return Find(node => node.HasClasses(classNames));
+
+            return Enumerable.Empty<HtmlNode>();
         }
 
         /// <summary>
@@ -130,19 +143,6 @@ namespace HtmlParsing
         /// <param name="name">class name</param>
         /// <returns>collection of html nodes</returns>
         public IEnumerable<HtmlNode> GetByClassName(string name) => GetByClassNames(new[] { name });
-
-        /// <summary>
-        /// Search through all nested elements
-        /// </summary>
-        /// <param name="predicate">predicate</param>
-        /// <returns>collection of html nodes</returns>
-        public IEnumerable<HtmlNode> Find(Predicate<HtmlNode> predicate)
-        {
-            if (Childs?.Count > 0)
-                for (int i = Schema.Index + 1; i <= Schema.LastIndex; i++)
-                    if (predicate.Invoke(_parser.Nodes[i]))
-                        yield return _parser.Nodes[i];
-        }
     }
 }
 

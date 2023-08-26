@@ -17,6 +17,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\HtmlParsing.XPathSelector\HtmlParsing.XPathSelector.csproj" />
       <ProjectReference Include="..\HtmlParsing\HtmlParsing.csproj" />
       <ProjectReference Include="..\XPathParsing\XPathParsing.csproj" />
     </ItemGroup>

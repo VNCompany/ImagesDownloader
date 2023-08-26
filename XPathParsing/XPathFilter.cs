@@ -4,7 +4,7 @@ namespace XPathParsing
 {
     public enum XPathSearchOption { Equality, StartsWith, EndsWith, Contains }
     
-    public class XPathFilter : IXPathFilter
+    public sealed class XPathFilter : IXPathFilter
     {
         public XPathValue Name { get; }
         public string Value { get; }
@@ -32,30 +32,29 @@ namespace XPathParsing
 
             return Option switch
             {
-                XPathSearchOption.Equality => value == input,
-                XPathSearchOption.StartsWith => value.StartsWith(input),
-                XPathSearchOption.EndsWith => value.EndsWith(input),
-                XPathSearchOption.Contains => value.Contains(input),
+                XPathSearchOption.Equality => input == value,
+                XPathSearchOption.StartsWith => input.StartsWith(value),
+                XPathSearchOption.EndsWith => input.EndsWith(value),
+                XPathSearchOption.Contains => input.Contains(value),
                 _ => false
             };
         }
 
         public static XPathFilter? Parse(ReadOnlySpan<char> filterSpan)
         {
-            filterSpan = filterSpan.Trim();
             int eqIndex = filterSpan.IndexOf('=');
-            if (eqIndex == 0 || eqIndex + 1 == filterSpan.Length)
+            if (eqIndex == 0 || eqIndex == filterSpan.Length - 1)
                 return null;
 
             bool caseInsensetive = filterSpan[eqIndex + 1] == 'i';
             
-            int leftPartMargin = caseInsensetive ? 1 : 0;
-            if (eqIndex + 2 + leftPartMargin >= filterSpan.Length
-                || filterSpan[eqIndex + 1 + leftPartMargin] != '\''
+            int rightPartMargin = caseInsensetive ? 1 : 0;
+            if (eqIndex + 2 + rightPartMargin >= filterSpan.Length
+                || filterSpan[eqIndex + 1 + rightPartMargin] != '\''
                 || filterSpan[^1] != '\'')
                 return null;
 
-            int valueStart = eqIndex + 2 + leftPartMargin;
+            int valueStart = eqIndex + 2 + rightPartMargin;
             ReadOnlySpan<char> valueSpan = filterSpan.Slice(valueStart, filterSpan.Length - valueStart - 1);
 
             XPathSearchOption option = GetOptionByChar(filterSpan[eqIndex - 1]);
