@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XPathParsing", "XPathParsin
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HtmlParsing.XPathSelector", "HtmlParsing.XPathSelector\HtmlParsing.XPathSelector.csproj", "{56704A62-6DD1-48C0-BAA1-FA72E32D8550}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImagesDownloader", "ImagesDownloader\ImagesDownloader.csproj", "{935016AD-DB02-4E5F-8028-6A2AFE7FD34D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{56704A62-6DD1-48C0-BAA1-FA72E32D8550}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{56704A62-6DD1-48C0-BAA1-FA72E32D8550}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{56704A62-6DD1-48C0-BAA1-FA72E32D8550}.Release|Any CPU.Build.0 = Release|Any CPU
+		{935016AD-DB02-4E5F-8028-6A2AFE7FD34D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{935016AD-DB02-4E5F-8028-6A2AFE7FD34D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{935016AD-DB02-4E5F-8028-6A2AFE7FD34D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{935016AD-DB02-4E5F-8028-6A2AFE7FD34D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

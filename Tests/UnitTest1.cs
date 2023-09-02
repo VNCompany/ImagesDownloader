@@ -134,5 +134,30 @@ namespace Tests
             Console.WriteLine("Pattern: {0}", pattern);
             Console.WriteLine("Parsed: {0}", parser);
         }
+
+        private string PrintDirectoryName(string? input)
+        {
+            if (input is null)
+                return "NULL: NULL";
+            
+            if (input == string.Empty)
+                return "EMPTY: EMPTY";
+
+            string? dir = Path.GetDirectoryName(input);
+            return string.Format("{0}: {1}", input,
+                dir == null ? "NULL" : (dir == string.Empty ? "EMPTY" : dir));
+        }
+
+        [Test]
+        public void Test2()
+        {
+            Console.WriteLine(PrintDirectoryName(@"C:\Users\User\file.txt"));
+            Console.WriteLine(PrintDirectoryName(@"C:\Users\User\"));
+            Console.WriteLine(PrintDirectoryName(@"C:\Users\User"));
+            Console.WriteLine(PrintDirectoryName(@"C:\Users\file.txt"));
+            Console.WriteLine(PrintDirectoryName(@"C:\file.txt"));
+            Console.WriteLine(PrintDirectoryName(@"C:\{filename}"));
+            Console.WriteLine(PrintDirectoryName(@"C:\"));
+        }
     }
 }
