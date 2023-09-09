@@ -22,22 +22,20 @@ namespace ImagesDownloader
                     int pp = ++p;
                     while (pp < str.Length && str[pp] != qch)
                     {
-                        if (str[pp] == '\\') { pp += 2; continue; }
-                        pp++;
+                        if (str[pp] == '\\') ++pp;
+                        ++pp;
                     }
 
                     yield return str.Substring(p, pp - p);
                     p = pp;
-                    if (pp != str.Length) p++;
+                    if (pp != str.Length) ++p;
                 }
                 else if (char.IsWhiteSpace(str[p]))
-                    p++;
+                    ++p;
                 else
                 {
                     int pp = p + 1;
-                    while (pp < str.Length && char.IsWhiteSpace(str[pp]) == false)
-                        pp++;
-
+                    while (pp < str.Length && char.IsWhiteSpace(str[pp]) == false) ++pp;
                     yield return str.Substring(p, pp - p);
                     p = pp;
                 }
