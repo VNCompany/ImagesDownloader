@@ -1,45 +1,87 @@
 using System;
+using System.IO;
+
+using XPathParsing;
 
 namespace ImagesDownloader
 {
+    enum DownloadMethodType { Undefined, FromFile, FromUrl }
+
     class DownloaderOptions
     {
-        public int ThreadsCount { get; set; } = 4;
+        public DownloadMethodType DownloadMethod { get; private set;  } = DownloadMethodType.Undefined;
         
-        public Uri? Url { get; set; }
+        public int ThreadsCount { get; private set; } = 4;
         
-        public OutputPathInfo? Output { get; set; }
+        public Uri? Url { get; private set; }
         
-        public string? Selector { get; set; }
+        public string? InputFile { get; private set; }
+        
+        public XPathParser? Pattern { get; private set; }
+        
+        public Uri? ContentPath { get; private set; }
+        
+        public OutputPath? SavePath { get; private set; }
 
-        public bool SetThreadsCount(string value)
+        public bool TrySetThreadsCount(string value)
         {
-            if (int.TryParse(value, out int result))
+            if (int.TryParse(value, out int result) && result > 0 && result <= 10)
             {
                 ThreadsCount = result;
                 return true;
             }
+
             return false;
         }
 
-        public bool SetOutput(string value) => (Output = OutputPathInfo.Parse(value)) != null;
-
-        public bool SetUrl(string value)
+        public bool TrySetUrl(string value)
         {
-            if (string.IsNullOrWhiteSpace(value)
-                || Uri.TryCreate(value, UriKind.Absolute, out Uri? result) == false)
+            if (Uri.TryCreate(value, UriKind.Absolute, out Uri? result))
+            {
+                Url = result;
+                DownloadMethod = DownloadMethodType.FromUrl;
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool TrySetInputFile(string value)
+        {
+            if (File.Exists(value))
+            {
+                InputFile = value;
+                DownloadMethod = DownloadMethodType.FromFile;
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool TrySetPattern(string value)
+        {
+            try
+            {
+                Pattern = new XPathParser(value);
+                return true;
+            }
+            catch (Exception)
+            {
                 return false;
-
-            Url = result;
-            return true;
+            }
         }
 
-        public bool SetSelector(string value)
+        public bool TrySetContentPath(string value)
         {
-            if (string.IsNullOrWhiteSpace(value)) return false;
+            if (Uri.TryCreate(value, UriKind.Absolute, out Uri? result))
+            {
+                ContentPath = result;
+                return true;
+            }
 
-            Selector = value;
-            return true;
+            return false;
         }
+
+        public bool TrySetSavePath(string value) => (SavePath = OutputPath.Create(value)) != null;
     }
 }

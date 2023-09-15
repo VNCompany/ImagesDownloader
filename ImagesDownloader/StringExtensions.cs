@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
@@ -13,32 +12,29 @@ namespace ImagesDownloader
         {
             if (string.IsNullOrWhiteSpace(str)) yield break;
 
-            int p = 0;
+            var p = 0;
             while (p < str.Length)
             {
-                if (IsQuoteChar(str[p]))
+                if (char.IsWhiteSpace(str[p]))
                 {
-                    char qch = str[p];
-                    int pp = ++p;
-                    while (pp < str.Length && str[pp] != qch)
-                    {
-                        if (str[pp] == '\\') ++pp;
-                        ++pp;
-                    }
-
-                    yield return str.Substring(p, pp - p);
-                    p = pp;
-                    if (pp != str.Length) ++p;
-                }
-                else if (char.IsWhiteSpace(str[p]))
                     ++p;
+                    continue;
+                }
+
+                var start = p;
+                var end = start + 1;
+                if (IsQuoteChar(str[start]))
+                {
+                    char qch = str[start];
+                    for (; end < str.Length && str[end] != qch; end++) { }
+                }
                 else
                 {
-                    int pp = p + 1;
-                    while (pp < str.Length && char.IsWhiteSpace(str[pp]) == false) ++pp;
-                    yield return str.Substring(p, pp - p);
-                    p = pp;
+                    for (; end < str.Length && !char.IsWhiteSpace(str[end]); end++) { }
                 }
+
+                yield return str.Substring(start, end - start);
+                p = end + 1;
             }
         }
     }

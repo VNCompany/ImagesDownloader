@@ -135,29 +135,25 @@ namespace Tests
             Console.WriteLine("Parsed: {0}", parser);
         }
 
-        private string PrintDirectoryName(string? input)
+        private void PrintDirectoryName(string? input)
         {
-            if (input is null)
-                return "NULL: NULL";
-            
-            if (input == string.Empty)
-                return "EMPTY: EMPTY";
-
-            string? dir = Path.GetDirectoryName(input);
-            return string.Format("{0}: {1}", input,
-                dir == null ? "NULL" : (dir == string.Empty ? "EMPTY" : dir));
+            string? directoryInfo = Path.GetDirectoryName(input);
+            Console.WriteLine("OriginalString: {0}", input);
+            Console.WriteLine("DirectoryInfo: {0}", directoryInfo == null ? "NULL" : $"'{directoryInfo}'");
+            Console.WriteLine();
         }
 
         [Test]
         public void Test2()
         {
-            Console.WriteLine(PrintDirectoryName(@"C:\Users\User\file.txt"));
-            Console.WriteLine(PrintDirectoryName(@"C:\Users\User\"));
-            Console.WriteLine(PrintDirectoryName(@"C:\Users\User"));
-            Console.WriteLine(PrintDirectoryName(@"C:\Users\file.txt"));
-            Console.WriteLine(PrintDirectoryName(@"C:\file.txt"));
-            Console.WriteLine(PrintDirectoryName(@"C:\{filename}"));
-            Console.WriteLine(PrintDirectoryName(@"C:\"));
+            PrintDirectoryName(@"C:\Users\User\file.txt");
+            PrintDirectoryName(@"C:\Users\User\");
+            PrintDirectoryName(@"C:\Users\User");
+            PrintDirectoryName(@"C:\Users\file.txt");
+            PrintDirectoryName(@"C:\file.txt");
+            PrintDirectoryName(@"C:\{filename}");
+            PrintDirectoryName("{filename}");
+            PrintDirectoryName(@"C:\");
         }
     }
 }
