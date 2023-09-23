@@ -1,6 +1,6 @@
 using System;
 
-namespace XPathParsing
+namespace OLD.XPathParsing
 {
     public enum XPathSearchOption { Equality, StartsWith, EndsWith, Contains }
     

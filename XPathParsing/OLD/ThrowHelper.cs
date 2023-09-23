@@ -1,6 +1,6 @@
 using System;
 
-namespace XPathParsing
+namespace OLD.XPathParsing
 {
     internal static class ThrowHelper
     {

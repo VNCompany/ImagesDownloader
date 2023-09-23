@@ -1,6 +1,6 @@
 using System;
 
-namespace XPathParsing
+namespace OLD.XPathParsing
 {
     public enum XPathValueType { Element, Attribute }
     
