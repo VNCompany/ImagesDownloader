@@ -1,7 +1,6 @@
 using HtmlParsing.Internal;
 using HtmlParsing;
 using XPathParsing;
-using HtmlParsing.XPathSelector;
 
 namespace Tests
 {
@@ -66,73 +65,6 @@ namespace Tests
                 Assert.That(r.GetString(tagAttrs[3].Key), Is.EqualTo("disabled"), "tagAttrs[3]");
                 Assert.That(r.GetString(tagAttrs[3].Value), Is.EqualTo("disabled"), "tagAttrs[3]");
             });
-        }
-
-        [TestCase("div='hello world'", false)]
-        [TestCase("@div='hello world'", false)]
-        [TestCase("@div=i'hello world'", false)]
-        [TestCase("@div%=i'hello world'", false)]
-        [TestCase("@div%=i'h'", false)]
-        [TestCase("@div%=i''", false)]
-        [TestCase("v=i''", false)]
-        [TestCase("v=''", false)]
-        [TestCase("@div%=ihello world'", true)]
-        [TestCase("@div%=i'hello world", true)]
-        [TestCase("@div%=hello world", true)]
-        [TestCase("@div=hello world", true)]
-        [TestCase("div=hello world", true)]
-        [TestCase("=hello world", true)]
-        [TestCase("hello world", true)]
-        [TestCase("hello", true)]
-        [TestCase("='hello'", true)]
-        [TestCase("%='hello'", true)]
-        [TestCase("%=i", true)]
-        [TestCase("%='i'", true)]
-        public void XPathValidationFilterParser(string pattern, bool isNull)
-        {
-            if ((XPathFilter.Parse(pattern) == null) != isNull)
-                Assert.Fail();
-        }
-
-        [TestCase("div='hello world'", "div", "hello world", false, XPathSearchOption.Equality)]
-        [TestCase("@div='hello world'", "@div", "hello world", false, XPathSearchOption.Equality)]
-        [TestCase("@div%='hello world'", "@div", "hello world", false, XPathSearchOption.Contains)]
-        [TestCase("@div%=i'hello world'", "@div", "hello world", true, XPathSearchOption.Contains)]
-        [TestCase("@div^=i'hello world'", "@div", "hello world", true, XPathSearchOption.StartsWith)]
-        [TestCase("@div$=i'hello world'", "@div", "hello world", true, XPathSearchOption.EndsWith)]
-        [TestCase("div$=i'hello world'", "div", "hello world", true, XPathSearchOption.EndsWith)]
-        [TestCase("div$=i'h'", "div", "h", true, XPathSearchOption.EndsWith)]
-        [TestCase("div='h'", "div", "h", false, XPathSearchOption.Equality)]
-        public void XPathCheckFilterParser(string pattern, string name, string value, bool caseInsensitive, 
-            XPathSearchOption option)
-        {
-            XPathFilter? filter = XPathFilter.Parse(pattern);
-            Assert.That(filter, Is.Not.Null);
-            
-            if (filter == null) return;
-            
-            Assert.Multiple(() =>
-            {
-                Assert.That(filter.Name.ValueType == XPathValueType.Attribute
-                    ? "@" + filter.Name.Value
-                    : filter.Name.Value, Is.EqualTo(name));
-                
-                Assert.That(filter.Value, Is.EqualTo(value));
-                
-                Assert.That(filter.CaseInsensitive, Is.EqualTo(caseInsensitive));
-                
-                Assert.That(filter.Option, Is.EqualTo(option));
-            });
-        }
-
-        [Test]
-        public void XPathTest()
-        {
-            // string pattern = "//main/div[3]/p[@class%='test-class']/img[test=i'value']/@src";
-            string pattern = "div[@class^=i'cls']/@src";
-            XPathParser parser = new XPathParser(pattern);
-            Console.WriteLine("Pattern: {0}", pattern);
-            Console.WriteLine("Parsed: {0}", parser);
         }
 
         private void PrintDirectoryName(string? input)

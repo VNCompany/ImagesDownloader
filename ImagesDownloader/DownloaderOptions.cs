@@ -17,7 +17,7 @@ namespace ImagesDownloader
         
         public string? InputFile { get; private set; }
         
-        public XPathParser? Pattern { get; private set; }
+        //public XPathParser? Pattern { get; private set; }
         
         public Uri? ContentPath { get; private set; }
         
@@ -62,7 +62,7 @@ namespace ImagesDownloader
         {
             try
             {
-                Pattern = new XPathParser(value);
+                //Pattern = new XPathParser(value);
                 return true;
             }
             catch (Exception)

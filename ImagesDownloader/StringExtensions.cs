@@ -25,7 +25,7 @@ namespace ImagesDownloader
                 var end = start + 1;
                 if (IsQuoteChar(str[start]))
                 {
-                    char qch = str[start];
+                    char qch = str[start++];
                     for (; end < str.Length && str[end] != qch; end++) { }
                 }
                 else

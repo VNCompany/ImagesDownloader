@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using HtmlParsing;
-using HtmlParsing.XPathSelector;
+//using HtmlParsing.XPathSelector;
 
 namespace ImagesDownloader
 {
