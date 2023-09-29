@@ -8,7 +8,7 @@ namespace XPathParsing
 
         public InvalidXPathException(string node) : base($"Invalid XPath sequence `{node}`") { }
         
-        public InvalidXPathException(string message, string node) 
+        public InvalidXPathException(string node, string message) 
             : base($"Invalid XPath sequence `{node}`: {message}") { }
     }
 }

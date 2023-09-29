@@ -21,14 +21,6 @@ namespace Tests
                 node.Content?.Length,
                 prefix);
         }
-
-        private void PrintAllNodes(IReadOnlyList<HtmlNode> allNodes, HtmlNode currentNode, int tab = 0)
-        {
-            PrintNode(currentNode, new string('\t', tab));
-
-            foreach (var htmlNode in allNodes.Where(n => n.Parent == currentNode))
-                PrintAllNodes(allNodes, htmlNode, tab + 1);
-        }
         
         [Test]
         public void Test1()
@@ -65,27 +57,6 @@ namespace Tests
                 Assert.That(r.GetString(tagAttrs[3].Key), Is.EqualTo("disabled"), "tagAttrs[3]");
                 Assert.That(r.GetString(tagAttrs[3].Value), Is.EqualTo("disabled"), "tagAttrs[3]");
             });
-        }
-
-        private void PrintDirectoryName(string? input)
-        {
-            string? directoryInfo = Path.GetDirectoryName(input);
-            Console.WriteLine("OriginalString: {0}", input);
-            Console.WriteLine("DirectoryInfo: {0}", directoryInfo == null ? "NULL" : $"'{directoryInfo}'");
-            Console.WriteLine();
-        }
-
-        [Test]
-        public void Test2()
-        {
-            PrintDirectoryName(@"C:\Users\User\file.txt");
-            PrintDirectoryName(@"C:\Users\User\");
-            PrintDirectoryName(@"C:\Users\User");
-            PrintDirectoryName(@"C:\Users\file.txt");
-            PrintDirectoryName(@"C:\file.txt");
-            PrintDirectoryName(@"C:\{filename}");
-            PrintDirectoryName("{filename}");
-            PrintDirectoryName(@"C:\");
         }
     }
 }
