@@ -18,7 +18,7 @@ namespace XPathParsing
             _index = result;
         }
 
-        public override IEnumerable<T> Apply<T>(XPathConditionArgs<T> args)
-            => args.Collection.Skip(_index).Take(1);
+        public override IEnumerable<T> Apply<T>(IEnumerable<T> collection, Func<T, IXPathProvider>? _ = null)
+            => collection.Skip(_index).Take(1);
     }
 }

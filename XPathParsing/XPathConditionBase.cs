@@ -7,7 +7,7 @@ namespace XPathParsing
 {
     public abstract class XPathConditionBase
     {
-        public abstract IEnumerable<T> Apply<T>(XPathConditionArgs<T> args);
+        public abstract IEnumerable<T> Apply<T>(IEnumerable<T> collection, Func<T, IXPathProvider>? provider = null);
         
         internal static XPathConditionBase Create(ReadOnlySpan<Parser.Token> tokens)
         {

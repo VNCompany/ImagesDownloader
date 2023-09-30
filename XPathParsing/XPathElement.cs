@@ -12,8 +12,12 @@ namespace XPathParsing
         
         public XPathConditionBase? Condition { get; }
         
-        internal XPathElement(ReadOnlySpan<Parser.Token> tokens)
+        public bool IsRelative { get; }
+        
+        internal XPathElement(ReadOnlySpan<Parser.Token> tokens, bool isRelative)
         {
+            IsRelative = isRelative;
+            
             int ptr = 0;
             if (tokens[ptr].Type == Parser.TokenType.Id)
                 ElementName = new XPathName(tokens[ptr++].Value);

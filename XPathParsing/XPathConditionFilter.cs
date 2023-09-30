@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 
+using XPathProviderDefault = XPathParsing.Internal.XPathProviderDefault;
 using Parser = XPathParsing.Internal.XPathElementParser;
 
 namespace XPathParsing
@@ -40,7 +41,10 @@ namespace XPathParsing
             };
         }
 
-        public override IEnumerable<T> Apply<T>(XPathConditionArgs<T> args)
-            => args.Collection.Where(t => args.Predicate?.Invoke(t, this) ?? false);
+        public override IEnumerable<T> Apply<T>(IEnumerable<T> collection, Func<T, IXPathProvider>? provider = null)
+        {
+            provider ??= XPathProviderDefault.GetProvider;
+            return collection.Where(t => provider.Invoke(t).ProcessCondition(this));
+        }
     }
 }
