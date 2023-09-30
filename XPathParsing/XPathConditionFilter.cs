@@ -24,7 +24,9 @@ namespace XPathParsing
                 || tokens[1].Type != Parser.TokenType.Operator
                 || tokens[^1].Type != Parser.TokenType.Literal
                 || (tokens.Length == 4 && tokens[2].Value != "i"))
-                throw new InvalidXPathException("Invalid filter body");
+                throw new InvalidXPathException(
+                    string.Concat(tokens.ToArray().Select(t => t.Value)),
+                    "Invalid filter body");
 
             IgnoreCase = tokens.Length == 4;
             ElementName = new XPathName(tokens[0].Value);

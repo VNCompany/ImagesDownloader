@@ -3,7 +3,7 @@ using XPathParsing.Internal;
 using PToken = XPathParsing.Internal.XPathElementParser.Token;
 using PTokenType = XPathParsing.Internal.XPathElementParser.TokenType;
 
-namespace Tests.XPathParsing
+namespace Tests.XPathParsingTests
 {
     [TestFixture]
     public class XPathNodeParserTests
