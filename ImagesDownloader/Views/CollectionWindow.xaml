@@ -54,7 +54,7 @@
 
         <StackPanel Grid.Row="4" Margin="0,0,0,5">
             <TextBlock>XPath:</TextBlock>
-            <ComboBox FontSize="13" IsEditable="True" Text="{Binding XPath}" />
+            <ComboBox FontSize="13" IsEditable="True" Text="{Binding XPath}" ItemsSource="{Binding XPaths}" />
         </StackPanel>
 
         <Button Grid.Row="5" Width="100" Margin="0,0,0,5" Command="{Binding ParseHtml}">Parse</Button>

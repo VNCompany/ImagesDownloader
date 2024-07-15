@@ -7,9 +7,8 @@ namespace ImagesDownloader.ViewModels;
 
 internal class CollectionViewModel : ViewModelBase
 {
-    private readonly DownloadClient _downloadClient = new(DebugLogger.Instance);
-
     private Uri _url = new Uri("http://localhost");
+    private readonly History _hist;
 
     public Uri Url => _url;
 
@@ -33,7 +32,9 @@ internal class CollectionViewModel : ViewModelBase
         }
     }
 
-    private string _xPath = string.Empty;
+    public IEnumerable<string> XPaths { get; }
+
+    private string _xPath;
     public string XPath
     {
         get => _xPath;
@@ -55,7 +56,7 @@ internal class CollectionViewModel : ViewModelBase
         }
     }
 
-    private string _savePath = string.Empty;
+    private string _savePath;
     public string SavePath
     {
         get => _savePath;
@@ -66,7 +67,7 @@ internal class CollectionViewModel : ViewModelBase
         }
     }
 
-    private string _namePattern = string.Empty;
+    private string _namePattern;
     public string NamePattern
     {
         get => _namePattern;
@@ -97,6 +98,12 @@ internal class CollectionViewModel : ViewModelBase
     public CollectionViewModel()
     {
         EventManager.AddSource(this);
+
+        _hist = Services.History;
+        XPaths = _hist.XPaths;
+        _xPath = _hist.LastXPath;
+        _savePath = _hist.LastSavePath;
+        _namePattern = _hist.LastNamePattern;
     }
 
     private void Analyze_Execute(object? param)
@@ -164,6 +171,11 @@ internal class CollectionViewModel : ViewModelBase
         {
             if (!Directory.Exists(SavePath))
                 Directory.CreateDirectory(SavePath);
+
+            _hist.AddXPathToList(XPath);
+            _hist.LastSavePath = Path.GetDirectoryName(SavePath) ?? SavePath;
+            if (_hist.LastSavePath == string.Empty) _hist.LastSavePath = SavePath;
+            _hist.LastNamePattern = NamePattern;
         }
         catch (Exception)
         {
@@ -211,7 +223,8 @@ internal class CollectionViewModel : ViewModelBase
     {
         try
         {
-            Html = await _downloadClient.DownloadHtml(_url);
+            using var downloadClient = new DownloadClient(DebugLogger.Instance);
+            Html = await downloadClient.DownloadHtml(_url);
         }
         catch (Exception ex)
         {
@@ -221,8 +234,7 @@ internal class CollectionViewModel : ViewModelBase
 
     public override void Dispose()
     {
-        base.Dispose();
         EventManager.RemoveSource(this);
-        _downloadClient.Dispose();
+        base.Dispose();
     }
 }

@@ -10,4 +10,6 @@ internal class DebugLogger : ILogger
     {
         Debug.WriteLine($"{DateTimeOffset.Now.ToString()} FAIL: {source}. {message}");
     }
+
+    public void Dispose() { }
 }

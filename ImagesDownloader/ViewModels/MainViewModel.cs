@@ -7,6 +7,7 @@ namespace ImagesDownloader.ViewModels;
 
 internal class MainViewModel : ViewModelBase
 {
+    private CancellationTokenSource? _tokenSource;
     public ObservableCollection<DownloadCollection> Collections { get; } = [];
 
     private DownloadCollection? selectedCollectionItem;
@@ -36,11 +37,24 @@ internal class MainViewModel : ViewModelBase
         };
 
         window.ShowDialog();
+        vm.Dispose();
     }
 
     private async void Start_Execute(object? _)
     {
-        using (var collectionDownloader = new CollectionsDownloader(DebugLogger.Instance, 1, 2))
-            await collectionDownloader.Start(Collections, default);
+        _tokenSource = new CancellationTokenSource();
+        using var collectionDownloader = new CollectionsDownloader(Services.Logger, 1, 2);
+        await collectionDownloader.Start(Collections, _tokenSource.Token);
+        _tokenSource.Dispose();
+        _tokenSource = null;
+    }
+
+    public override void Dispose()
+    {
+        _tokenSource?.Cancel();
+        _tokenSource?.Dispose();
+        Services.History.Dispose();
+        Services.Logger.Dispose();
+        base.Dispose();
     }
 }
