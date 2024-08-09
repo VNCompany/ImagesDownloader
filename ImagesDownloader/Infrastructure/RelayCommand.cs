@@ -1,6 +1,6 @@
 ﻿using System.Windows.Input;
 
-namespace ImagesDownloader;
+namespace ImagesDownloader.Infrastructure;
 
 internal class RelayCommand : ICommand
 {

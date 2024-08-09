@@ -10,18 +10,16 @@ internal class CollectionsDownloader : IDisposable
         Canceled = 1, Failed = 2, Success = 3
     }
 
-    private readonly ILogger _logger;
     private readonly int _downloadItemsPoolSize;
     private readonly SemaphoreSlim _mainSemaphore;
     private readonly DownloadClient _downloadClient;
 
-    public CollectionsDownloader(ILogger logger, int downloadCollectionsPoolSize, int downloadItemsPoolSize)
+    public CollectionsDownloader(int downloadCollectionsPoolSize, int downloadItemsPoolSize)
     {
         _downloadItemsPoolSize = downloadItemsPoolSize;
-        _logger = logger;
 
         _mainSemaphore = new SemaphoreSlim(downloadCollectionsPoolSize);
-        _downloadClient = new DownloadClient(_logger);
+        _downloadClient = new DownloadClient();
     }
 
     public async Task Start(IEnumerable<DownloadCollection> collections, CancellationToken cancellationToken)

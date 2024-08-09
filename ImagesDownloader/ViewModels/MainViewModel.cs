@@ -2,6 +2,7 @@
 
 using ImagesDownloader.Models;
 using ImagesDownloader.Common;
+using ImagesDownloader.Infrastructure;
 
 namespace ImagesDownloader.ViewModels;
 
@@ -27,23 +28,24 @@ internal class MainViewModel : ViewModelBase
 
     private void Add_Execute(object? _)
     {
-        var window = ViewProvider.CreateWindow<CollectionViewModel>();
-        var vm = window.ViewModel!;
-        vm.CloseActionCallback = () =>
-        {
-            Collections.Add(new DownloadCollection(vm.Url, vm.SavePath, vm.NamePattern, vm.Items));
-            window.Close();
-            Start.OnCanExecuteChanged();
-        };
+        // TODO: 
+        //var window = ViewProvider.CreateWindow<CollectionViewModel>();
+        //var vm = window.ViewModel!;
+        //vm.CloseActionCallback = () =>
+        //{
+        //    Collections.Add(new DownloadCollection(vm.Url, vm.SavePath, vm.NamePattern, vm.Items));
+        //    window.Close();
+        //    Start.OnCanExecuteChanged();
+        //};
 
-        window.ShowDialog();
-        vm.Dispose();
+        //window.ShowDialog();
+        //vm.Dispose();
     }
 
     private async void Start_Execute(object? _)
     {
         _tokenSource = new CancellationTokenSource();
-        using var collectionDownloader = new CollectionsDownloader(Services.Logger, 1, 2);
+        using var collectionDownloader = new CollectionsDownloader(1, 2);
         await collectionDownloader.Start(Collections, _tokenSource.Token);
         _tokenSource.Dispose();
         _tokenSource = null;
@@ -53,8 +55,6 @@ internal class MainViewModel : ViewModelBase
     {
         _tokenSource?.Cancel();
         _tokenSource?.Dispose();
-        Services.History.Dispose();
-        Services.Logger.Dispose();
         base.Dispose();
     }
 }

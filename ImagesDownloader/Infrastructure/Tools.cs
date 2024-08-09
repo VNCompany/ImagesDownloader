@@ -1,4 +1,4 @@
-﻿namespace ImagesDownloader.Common;
+﻿namespace ImagesDownloader.Infrastructure;
 
 internal static class Tools
 {

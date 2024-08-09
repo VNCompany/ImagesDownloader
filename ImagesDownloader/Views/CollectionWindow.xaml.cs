@@ -1,7 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-
 using ImagesDownloader.ViewModels;
 
 namespace ImagesDownloader.Views
@@ -15,7 +14,6 @@ namespace ImagesDownloader.Views
         {
             InitializeComponent();
 
-            EventManager.AddHandler(DataContext, HandleViewModelEvent);
             tbUrl.KeyDown += TbUrl_KeyDown;
         }
 
@@ -32,16 +30,6 @@ namespace ImagesDownloader.Views
                 }
                 else if (collectionVM.Analyze.CanExecute(false))
                     collectionVM.Analyze.Execute(false);
-            }
-        }
-
-        private void HandleViewModelEvent(object? sender, ViewModelEventArgs args)
-        {
-            switch (args.EventId)
-            {
-                case 1:
-                    btnAdd.Focus();
-                    break;
             }
         }
     }

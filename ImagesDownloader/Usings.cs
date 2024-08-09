@@ -1,1 +1,2 @@
-﻿global using Debug = System.Diagnostics.Debug;
+﻿global using ImagesDownloader.Infrastructure;
+global using ImagesDownloader.ServiceExtensions;

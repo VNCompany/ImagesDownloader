@@ -10,11 +10,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="ValueConverters\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="HtmlAgilityPack" Version="1.11.61" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
   </ItemGroup>
 
 </Project>

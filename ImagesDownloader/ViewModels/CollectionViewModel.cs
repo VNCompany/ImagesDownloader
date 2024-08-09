@@ -8,7 +8,7 @@ namespace ImagesDownloader.ViewModels;
 internal class CollectionViewModel : ViewModelBase
 {
     private Uri _url = new Uri("http://localhost");
-    private readonly History _hist;
+    private readonly History _hist = new History();
 
     public Uri Url => _url;
 
@@ -97,9 +97,6 @@ internal class CollectionViewModel : ViewModelBase
 
     public CollectionViewModel()
     {
-        EventManager.AddSource(this);
-
-        _hist = Services.History;
         XPaths = _hist.XPaths;
         _xPath = _hist.LastXPath;
         _savePath = _hist.LastSavePath;
@@ -223,7 +220,7 @@ internal class CollectionViewModel : ViewModelBase
     {
         try
         {
-            using var downloadClient = new DownloadClient(DebugLogger.Instance);
+            using var downloadClient = new DownloadClient();
             Html = await downloadClient.DownloadHtml(_url);
         }
         catch (Exception ex)
@@ -234,7 +231,6 @@ internal class CollectionViewModel : ViewModelBase
 
     public override void Dispose()
     {
-        EventManager.RemoveSource(this);
         base.Dispose();
     }
 }

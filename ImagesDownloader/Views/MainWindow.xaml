@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ImagesDownloader.Views"
+        xmlns:inf="clr-namespace:ImagesDownloader.Infrastructure"
         xmlns:vm="clr-namespace:ImagesDownloader.ViewModels"
         mc:Ignorable="d"
         Title="Images Downloader" 
@@ -11,7 +12,7 @@
         MinHeight="400" MinWidth="750">
 
     <Window.DataContext>
-        <vm:MainViewModel />
+        <inf:DISource Type="{x:Type vm:MainViewModel}" />
     </Window.DataContext>
     
     <Grid>

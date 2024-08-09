@@ -1,11 +1,15 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
+using ImagesDownloader.Interfaces;
+
 namespace ImagesDownloader.ViewModels;
 
-internal abstract class ViewModelBase : INotifyPropertyChanged, IDisposable
+internal abstract class ViewModelBase : IViewModel
 {
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    public IServiceProvider ServiceProvider { get; set; } = null!;
 
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

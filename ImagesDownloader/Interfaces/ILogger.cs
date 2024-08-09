@@ -1,6 +1,6 @@
 ﻿namespace ImagesDownloader.Interfaces;
 
-public interface ILogger : IDisposable
+internal interface ILogger
 {
-    void Error(string source, string message);
+    void LogError(string message);
 }

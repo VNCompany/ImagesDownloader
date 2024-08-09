@@ -16,7 +16,7 @@ internal class History : IDisposable
 
     public string LastNamePattern { get; set; } = string.Empty;
 
-    public static History Load(ILogger logger)
+    public static History Load()
     {
         try
         {
@@ -25,7 +25,7 @@ internal class History : IDisposable
         }
         catch (Exception ex)
         {
-            logger.Error("History.Load", $"Failed load history file: {ex.Message}");
+            // TODO: logger.Error("History.Load", $"Failed load history file: {ex.Message}");
             return new History();
         }
     }
