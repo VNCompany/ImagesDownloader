@@ -1,23 +1,23 @@
-﻿namespace ImagesDownloader.Services.Download;
+﻿using ImagesDownloader.Interfaces;
 
-internal sealed class DownloadService : IDisposable
+namespace ImagesDownloader.Services.Download;
+
+internal class DownloadService : IDisposable
 {
-    private readonly object _thLocker = new object();
+    private readonly ILogger _logger;
 
-    public event EventHandler<(object, object)>? ItemDownloaded;
-
-    public async Task Start() { }
-
-    public async Task Stop() { }
+    public DownloadService(ILogger logger)
+    {
+        _logger = logger;
+    }
 
     public void Dispose()
     {
-        Stop();
     }
 
-    private void OnItemDownloaded(DownloadCollection collection, DownloadCollectionItem item)
+    private void OnItemDownloadFailed(DownloadCollectionItem item, Exception exception)
     {
-        lock (_thLocker)
-            ItemDownloaded?.Invoke(this, (collection.Source, item.Source));
+        _logger.LogError($"{exception.GetType().Name}: " +
+            $"{exception.Message} \n\tUrl: {item.Url} \n\tPath: {item.SavePath}", "Load item");
     }
 }

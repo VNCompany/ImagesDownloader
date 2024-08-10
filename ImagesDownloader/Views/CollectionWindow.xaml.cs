@@ -23,13 +23,9 @@ namespace ImagesDownloader.Views
             {
                 tbUrl.GetBindingExpression(TextBox.TextProperty).UpdateSource();
 
-                if (Keyboard.Modifiers == ModifierKeys.Control)
-                {
-                    if (collectionVM.Analyze.CanExecute(true))
-                        collectionVM.Analyze.Execute(true);
-                }
-                else if (collectionVM.Analyze.CanExecute(false))
-                    collectionVM.Analyze.Execute(false);
+                bool isCtrlPressed = Keyboard.Modifiers == ModifierKeys.Control;
+                if (collectionVM.Analyze.CanExecute(isCtrlPressed))
+                    collectionVM.Analyze.Execute(isCtrlPressed);
             }
         }
     }
