@@ -14,7 +14,7 @@ internal class DownloadItem
         OutputPath = Path.Combine(outputDir, fileName);
     }
 
-    public static DownloadItem Create(int number, Uri url, string outputDir, string fileNameFormat)
+    public static DownloadItem Create(int number, Uri url, string outputDir, string fileNamePattern)
     {
         string urlName = url.Segments.Reverse().SkipWhile(x => x.Trim('/') == string.Empty).FirstOrDefault()
             ?? string.Empty;
@@ -33,7 +33,7 @@ internal class DownloadItem
             extension = urlName.Substring(urlExtensionDotPosition + 1);
         }
 
-        string fileName = new StringBuilder(fileNameFormat)
+        string fileName = new StringBuilder(fileNamePattern)
             .Replace("$number", number.ToString())
             .Replace("$urlname", urlName)
             .Replace("$name", name)

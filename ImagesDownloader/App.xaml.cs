@@ -30,9 +30,9 @@ namespace ImagesDownloader
 
         private void ConfigureServices(IServiceCollection services)
         {
-            // Logging
             services.AddSingleton<ILogger, DebugLogger>();
-
+            services.AddSingleton<AppSettings>();
+            services.AddSingleton<Services.Download.DownloadService>();
             services.AddViewModels();
         }
 

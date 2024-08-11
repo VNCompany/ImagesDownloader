@@ -4,15 +4,26 @@ using System.Collections.ObjectModel;
 
 namespace ImagesDownloader.Services.Download;
 
+internal enum DownloadCollectionStatus
+{
+    Waiting,
+    Process,
+    Canceled,
+    Done
+}
+
 internal class DownloadCollection(IEnumerable<DownloadCollectionItem> items) : INotifyPropertyChanged, IDisposable
 {
     public event PropertyChangedEventHandler? PropertyChanged;
 
     private readonly HttpClient _client = new();
+
     private CancellationTokenSource? _cts;
 
     public DownloadCollectionItem[] Items { get; } = items.ToArray();
     public ObservableCollection<DownloadLogItem> Log { get; } = [];
+
+    public bool IsCompleted => Items.Length == Log.Count;
 
     private float _downloadPercent = 0;
     public float DownloadPercent
@@ -25,11 +36,26 @@ internal class DownloadCollection(IEnumerable<DownloadCollectionItem> items) : I
         }
     }
 
+    private DownloadCollectionStatus _status;
+    public DownloadCollectionStatus Status
+    {
+        get => _status;
+        set
+        {
+            _status = value;
+            OnPropertyChanged(nameof(Status));
+        }
+    }
+
     public async Task Download(
         int downloadsPerThreadCount, 
         Action<DownloadCollectionItem, Exception> errorCallback,
         CancellationToken cancellationToken)
     {
+        if (_cts != null)
+            _cts.Dispose();
+
+        Status = DownloadCollectionStatus.Process;
         using var sema = new SemaphoreSlim(downloadsPerThreadCount);
         _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         var token = _cts.Token;
@@ -48,7 +74,7 @@ internal class DownloadCollection(IEnumerable<DownloadCollectionItem> items) : I
         }
 
         await Task.WhenAll(tasks);
-        Dispose();
+        Status = IsCompleted ? DownloadCollectionStatus.Done : DownloadCollectionStatus.Canceled;
     }
 
     public void Dispose()
