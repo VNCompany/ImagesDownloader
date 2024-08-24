@@ -1,45 +1,35 @@
 ﻿using System.IO;
-using System.Text;
+using System.Net.Http;
+
+using ImagesDownloader.Enums;
 
 namespace ImagesDownloader.Models;
 
-internal class DownloadItem
+internal class DownloadItem(Uri source, string savePath)
 {
-    public Uri Url { get; set; }
-    public string OutputPath { get; set; }
+    public Uri Source { get; } = source;
+    public string SavePath { get; } = savePath;
+    public DownloadStatus Status { get; private set; } = DownloadStatus.Waiting;
+    public bool IsSuccess => Status == DownloadStatus.Done;
 
-    private DownloadItem(Uri url, string outputDir, string fileName)
+    public async Task<DownloadStatus> Download(HttpClient client, CancellationToken cancellationToken)
     {
-        Url = url;
-        OutputPath = Path.Combine(outputDir, fileName);
-    }
-
-    public static DownloadItem Create(int number, Uri url, string outputDir, string fileNamePattern)
-    {
-        string urlName = url.Segments.Reverse().SkipWhile(x => x.Trim('/') == string.Empty).FirstOrDefault()
-            ?? string.Empty;
-        string name;
-        string extension;
-
-        int urlExtensionDotPosition = urlName.LastIndexOf('.');
-        if (urlExtensionDotPosition == -1)
+        try
         {
-            name = urlName;
-            extension = string.Empty;
+            byte[] bytes = await client.GetByteArrayAsync(Source, cancellationToken);
+            await File.WriteAllBytesAsync(SavePath, bytes, cancellationToken);
+            return Status = DownloadStatus.Done;
         }
-        else
+        catch (TaskCanceledException tce)
         {
-            name = urlName.Substring(0, urlExtensionDotPosition);
-            extension = urlName.Substring(urlExtensionDotPosition + 1);
+            Status = tce.InnerException is TimeoutException
+                ? DownloadStatus.Failed : DownloadStatus.Canceled;
+            throw;
         }
-
-        string fileName = new StringBuilder(fileNamePattern)
-            .Replace("$number", number.ToString())
-            .Replace("$urlname", urlName)
-            .Replace("$name", name)
-            .Replace("$extension", extension)
-            .ToString();
-
-        return new DownloadItem(url, outputDir, fileName);
+        catch (Exception)
+        {
+            Status = DownloadStatus.Failed;
+            throw;
+        }
     }
 }
