@@ -3,6 +3,7 @@ using System.Windows;
 
 using ImagesDownloader.Interfaces;
 using ImagesDownloader.Services;
+using ImagesDownloader.ServiceExtensions;
 
 namespace ImagesDownloader
 {
@@ -32,7 +33,7 @@ namespace ImagesDownloader
         {
             services.AddSingleton<ILogger, DebugLogger>();
             services.AddSingleton<AppSettings>();
-            services.AddSingleton<Services.Download.DownloadService>();
+            services.AddSingleton<DownloadService>();
             services.AddViewModels();
         }
 
