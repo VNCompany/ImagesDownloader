@@ -1,72 +1,70 @@
 ﻿using System.Net.Http;
 using System.ComponentModel;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Runtime.CompilerServices;
 
-using ImagesDownloader.Enums;
+using ImagesDownloader.Common;
 
 namespace ImagesDownloader.Models;
 
-internal class DownloadItemsCollection(IEnumerable<DownloadItem> items) : INotifyPropertyChanged
+internal sealed class DownloadItemsCollection : INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;
+    public event EventHandler<ItemDownloadedEventArgs>? ItemDownloaded;
 
-    public DownloadItem[] Items { get; } = items.ToArray();
-    public ObservableCollection<DownloadItem> Log { get; } = [];
+    public DownloadItem[] Items { get; }
+    /// <summary>
+    /// Item1 is Source URL, 
+    /// Item2 is success boolean status
+    /// </summary>
+    public ObservableCollection<Tuple<string, bool>> Logs { get; } = [];
+    public double Percent => (double)Logs.Count / Items.Length * 100.0;
 
-    private DownloadStatus _status = DownloadStatus.Waiting;
-    public DownloadStatus Status
+    public DownloadItemsCollection(IEnumerable<DownloadItem> items)
     {
-        get => _status;
-        private set => SetProperty(ref _status, value);
+        Items = items.ToArray();
+        Logs.CollectionChanged += Logs_CollectionChanged;
     }
 
-    private double _percent;
-    public double Percent
+    public async Task Download(HttpClient client, int poolSize CancellationToken cancellationToken)
     {
-        get => _percent;
-        private set => SetProperty(ref _percent, value);
-    }
-
-    public async Task Download(
-        int connectionsPerUnitCount, 
-        CancellationToken cancellationToken, 
-        Action<DownloadItem> errorCallback)
-    {
-        using var client = new HttpClient();
-        using var sema = new SemaphoreSlim(connectionsPerUnitCount);
-
-        // TODO: Make download queue
-        var tasks = new List<Task>();
-        foreach (var item in Items.Where(x => x.Status < DownloadStatus.Done))
-        {
-            var t = Task.Run(async () =>
+        await TaskPool.Run(
+            Items.Where(x => !x.IsCompleted).Select(x =>
             {
-                await sema.WaitAsync(cancellationToken);
+                Func<Task> f = async () =>
+                {
+                    Exception? exception = null;
+                    try
+                    {
+                        await x.Download(client, cancellationToken);
+                    }
+                    catch (OperationCanceledException) when (x.IsCompleted)
+                    {
+                        return;
+                    }
+                    catch (Exception ex)
+                    {
+                        exception = ex;
+                    }
 
-                sema.Release();
-            }, cancellationToken);
-            tasks.Add(t);
-        }
-
-        await Task.WhenAll(tasks);
+                    OnItemDownloaded(new ItemDownloadedEventArgs(x, exception == null, exception));
+                };
+                return f;
+            }), poolSize, cancellationToken);
     }
 
-    private void OnItemDownloaded(DownloadItem item)
-    {
-        if (item.Status == DownloadStatus.Canceled) return;
+    private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-        lock (this)
-        {
-            Log.Add(item);
-            Percent = (double)Log.Count / Items.Length * 100.0;
-            if (Log.Count == Items.Length) Status = DownloadStatus.Done;
-        }
+    private void OnItemDownloaded(ItemDownloadedEventArgs e)
+    {
+        lock (this) Logs.Add(new(e.DownloadedItem.Source.ToString(), e.IsSuccess));
+        ItemDownloaded?.Invoke(this, e);
     }
 
-    private void SetProperty<T>(ref T prop, T newValue, [CallerMemberName] string? propertyName = null)
+    private void Logs_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        prop = newValue;
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        OnPropertyChanged(nameof(Percent));
     }
 }

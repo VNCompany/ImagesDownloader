@@ -2,9 +2,7 @@
 
 internal enum DownloadStatus
 {
-    Waiting,
-    Process,
-    Canceled,
-    Done,
-    Failed
+    NotStarted,
+    Downloading,
+    Completed
 }
