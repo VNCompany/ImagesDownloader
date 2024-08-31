@@ -23,11 +23,5 @@ namespace ImagesDownloader.Views
         {
             InitializeComponent();
         }
-
-        protected override void OnClosed(EventArgs e)
-        {
-            (DataContext as IDisposable)?.Dispose();
-            base.OnClosed(e);
-        }
     }
 }

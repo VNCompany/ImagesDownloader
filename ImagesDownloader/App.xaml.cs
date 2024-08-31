@@ -20,20 +20,18 @@ namespace ImagesDownloader
             ConfigureServices(services);
             _serviceProvider = services.BuildServiceProvider();
 
-            DISource.Resolver = vmType =>
-            {
-                var service = _serviceProvider.GetRequiredService(vmType);
-                if (service is IViewModel viewModel)
-                    viewModel.ServiceProvider = _serviceProvider;
-                return service;
-            };
+            DISource.Resolver = vmType => _serviceProvider.GetRequiredService(vmType);
         }
 
-        private void ConfigureServices(IServiceCollection services)
+        private static void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<ILogger, DebugLogger>();
             services.AddSingleton<AppSettings>();
+            services.AddSingleton<ViewsProvider>();
             services.AddSingleton<DownloadService>();
+
+            services.AddTransient<IDownloadClient, DownloadClientTest>();
+
             services.AddViewModels();
         }
 

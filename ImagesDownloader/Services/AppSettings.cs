@@ -7,20 +7,16 @@ namespace ImagesDownloader.Services;
 
 internal class AppSettings : IDisposable
 {
-    private readonly ILogger _logger;
-
     public List<string> XPathSuggests { get; set; } = [];
     [JsonIgnore]
     public string LastXPathSuggest => XPathSuggests.Count != 0 ? XPathSuggests[^1] : string.Empty;
     public string SavePathSuggest { get; set; } = string.Empty;
     public string NamePatternSuggest { get; set; } = string.Empty;
-    public int MaxDownloadingItemsCount { get; set; } = 1;
-    public int MaxDownloadingCollectionsCount { get; set; } = 1;
+    public int ItemsPoolSize { get; set; } = 1;
+    public int ItemsCollections { get; set; } = 1;
 
     public AppSettings(ILogger logger)
     {
-        _logger = logger;
-        
         if (File.Exists("appsettings.json"))
         {
             string data = File.ReadAllText("appsettings.json");

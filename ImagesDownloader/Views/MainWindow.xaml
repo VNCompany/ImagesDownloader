@@ -4,81 +4,14 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ImagesDownloader.Views"
-        xmlns:inf="clr-namespace:ImagesDownloader.Infrastructure"
-        xmlns:vm="clr-namespace:ImagesDownloader.ViewModels"
         mc:Ignorable="d"
-        Title="Images Downloader" 
-        Height="450" Width="800"
-        MinHeight="400" MinWidth="750">
-
-    <Window.DataContext>
-        <inf:DISource Type="{x:Type vm:MainViewModel}" />
-    </Window.DataContext>
-    
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="70*" />
-            <RowDefinition Height="30*" />
-        </Grid.RowDefinitions>
-
-        <StackPanel Orientation="Horizontal" Margin="4">
-            <StackPanel.Resources>
-                <Style TargetType="Button">
-                    <Setter Property="Width" Value="100" />
-                    <Setter Property="FontSize" Value="14" />
-                    <Setter Property="Padding" Value="10,2" />
-                </Style>
-            </StackPanel.Resources>
-            <Button Command="{Binding Add}" Margin="0,0,5,0">Add</Button>
-            <Button Command="{Binding Start}" Margin="0,0,5,0">Start</Button>
-        </StackPanel>
-
-        <ListView Grid.Row="1" ItemsSource="{Binding Collections}" SelectedItem="{Binding SelectedCollectionItem}">
-            <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                    <Setter Property="VerticalContentAlignment" Value="Stretch" />
-                    <Setter Property="Height" Value="24" />
-                </Style>
-            </ListView.ItemContainerStyle>
-
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="URL" Width="350" DisplayMemberBinding="{Binding Url}" />
-                    <GridViewColumn Header="Percent" Width="80">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding DownloadPercent, Mode=OneWay, StringFormat=\{0:0.0\\%\}}" HorizontalAlignment="Right" />
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Header="Progress" Width="150">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <ProgressBar HorizontalAlignment="Stretch" Height="12" Maximum="100" Value="{Binding DownloadPercent, Mode=OneWay}" />
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                </GridView>
-            </ListView.View>
-        </ListView>
-
-        <ListBox Grid.Row="2" ItemsSource="{Binding SelectedCollectionItem.Logs}">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
-                        <Ellipse Margin="0,1,0,0" Fill="Green" Width="9" Height="9" VerticalAlignment="Center" Name="StatusEllipse"/>
-                        <TextBlock Margin="5,0,0,0" VerticalAlignment="Center" Text="{Binding Url, Mode=OneWay}" />
-                    </StackPanel>
-
-                    <DataTemplate.Triggers>
-                        <DataTrigger Binding="{Binding IsSuccess}" Value="False">
-                            <Setter TargetName="StatusEllipse" Property="Fill" Value="Red" />
-                        </DataTrigger>
-                    </DataTemplate.Triggers>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
-    </Grid>
+        Title="MainWindow" Height="450" Width="800">
+    <DockPanel>
+        <ToolBar DockPanel.Dock="Top">
+            <Button>Add</Button>
+            <Button>Start</Button>
+            <Button>Stop</Button>
+        </ToolBar>
+        <ListView DockPanel.Dock="Bottom" />
+    </DockPanel>
 </Window>
