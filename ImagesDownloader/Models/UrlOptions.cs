@@ -1,16 +1,10 @@
 ﻿namespace ImagesDownloader.Models;
 
-internal class UrlOptions
+internal class UrlOptions(Uri target, string? fileName)
 {
-    public Uri Target { get; }
-    public string? FileName { get; }
+    public Uri Target { get; } = target;
+    public string? FileName { get; } = fileName;
     public string Domain => Target.Host;
-
-    public UrlOptions(Uri target, string? fileName)
-    {
-        Target = target;
-        FileName = fileName;
-    }
 
     public static UrlOptions Parse(Uri input)
     {
