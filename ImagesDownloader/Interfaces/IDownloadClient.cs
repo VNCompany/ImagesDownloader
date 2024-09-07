@@ -1,6 +1,6 @@
 namespace ImagesDownloader.Interfaces;
 
-internal interface IDownloadClient
+internal interface IDownloadClient : IDisposable
 {
     Task SaveData(Uri uri, string outputPath, CancellationToken cancellationToken);
 }

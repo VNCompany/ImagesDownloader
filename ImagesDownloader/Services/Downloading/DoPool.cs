@@ -9,7 +9,6 @@ internal class DoPool : IDisposable
 {
     public event EventHandler<DoInfo>? ItemDownloaded;
 
-    private readonly int _poolSize;
     private readonly int _sleepTime;
     private readonly List<DownloadItemCollection> _collections;
     private readonly IDownloadClient _downloadClient;
@@ -26,7 +25,6 @@ internal class DoPool : IDisposable
         IDownloadClient downloadClient, 
         CancellationToken cancellationToken)
     {
-        _poolSize = poolSize;
         _sleepTime = sleepTime;
         _collections = collections;
         _downloadClient = downloadClient;
@@ -35,13 +33,19 @@ internal class DoPool : IDisposable
         _cancellationSources = new(_collections.Count);
         foreach (var collection in collections)
             _cancellationSources.Add(collection, CancellationTokenSource.CreateLinkedTokenSource(cancellationToken));
-    }
 
-    public void Start()
-    {
-        _tasks = new Task[_poolSize];
+        _tasks = new Task[poolSize];
         for (int i = 0; i < _tasks.Length; ++i)
             _tasks[i] = Task.Run(Do, CancellationToken.None);
+    }
+
+    public void Wait()
+    {
+        if (_tasks != null)
+        {
+            Task.WaitAll(_tasks);
+            _tasks = null;
+        }
     }
 
     public void Dispose()
@@ -51,25 +55,27 @@ internal class DoPool : IDisposable
             cancellationSource.Cancel();
             cancellationSource.Dispose();
         }
-        if (_tasks != null)
-        {
-            Task.WaitAll(_tasks);
-            _tasks = null;
-        }
+        Wait();
         _cancellationSources.Clear();
     }
 
     private bool TakeItem([NotNullWhen(true)] out DoInfo? info)
     {
         info = null;
-        _resourcesSemaphore.Wait();
-        if (_collections.Count == 0) return false;
-        var selectedCollection = _collections[^1];
-        info = new DoInfo(selectedCollection, selectedCollection.ItemsQueue.Dequeue());
-        if (selectedCollection.ItemsQueue.Count == 0)
-            _collections.RemoveAt(_collections.Count - 1);
-        _resourcesSemaphore.Release();
-        return true;
+        try
+        {
+            _resourcesSemaphore.Wait();
+            if (_collections.Count == 0) return false;
+            var selectedCollection = _collections[^1];
+            info = new DoInfo(selectedCollection, selectedCollection.ItemsQueue.Dequeue());
+            if (selectedCollection.ItemsQueue.Count == 0)
+                _collections.RemoveAt(_collections.Count - 1);
+            return true;
+        }
+        finally
+        {
+            _resourcesSemaphore.Release();
+        }
     }
 
     private async Task Do()
@@ -81,6 +87,8 @@ internal class DoPool : IDisposable
             try
             {
                 await _downloadClient.SaveData(info.Item.Source, info.Item.OutputPath, cancellationToken);
+                info.Item.IsSuccess = true;
+                await Task.Delay(_sleepTime, _mainCancellationToken);
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
@@ -88,7 +96,8 @@ internal class DoPool : IDisposable
             }
             catch (Exception ex)
             {
-                info.Exception = ex;
+                if (!info.Item.IsSuccess)
+                    info.Exception = ex;
             }
             info.Item.IsSuccess = info.IsSuccess;
             ItemDownloaded?.Invoke(this, info);
