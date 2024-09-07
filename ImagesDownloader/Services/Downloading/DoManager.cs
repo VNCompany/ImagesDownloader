@@ -44,16 +44,11 @@ internal class DoManager
             CancellationToken.None);
         doPool.ItemDownloaded += (s, e) =>
         {
-            var sb = new System.Text.StringBuilder();
-            sb.Append("ItemDownloaded event triggered:");
-            sb.Append("\n\tItem: " + e.Item);
-            if (!e.IsSuccess)
-                sb.Append($"\n\tException?: {e.Exception?.GetType().Name}. {e.Exception?.Message}");
-
+            string log = $"ItemDownloaded event triggered: {e.Item}";
             if (e.IsSuccess)
-                _logger.Log(LogType.INFO, sb.ToString());
+                _logger.LogInformation(log);
             else
-                _logger.LogError(sb.ToString());
+                _logger.LogError() // TODO
         };
         doPool.Wait();
         doPool.Dispose();

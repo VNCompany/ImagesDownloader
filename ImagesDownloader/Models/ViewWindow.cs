@@ -1,12 +1,11 @@
 ﻿using System.Windows;
-
 using ImagesDownloader.Interfaces;
 
-namespace ImagesDownloader.Common;
+namespace ImagesDownloader.Models;
 
 internal class ViewWindow<TViewModel>(Window win) : IView<TViewModel> where TViewModel : class, IViewModel
 {
-    public TViewModel Context { get; } = (win.DataContext as TViewModel) 
+    public TViewModel Context { get; } = win.DataContext as TViewModel
         ?? throw new ArgumentException(nameof(win.DataContext));
 
     public void Close() => win.Close();

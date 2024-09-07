@@ -3,8 +3,7 @@ using System.Windows;
 
 using ImagesDownloader.Interfaces;
 using ImagesDownloader.Services;
-using ImagesDownloader.Services.Downloading;
-using ImagesDownloader.ServiceExtensions;
+using ImagesDownloader.Extensions;
 
 namespace ImagesDownloader
 {
@@ -29,7 +28,7 @@ namespace ImagesDownloader
             services.AddSingleton<ILogger, DebugLogger>();
             services.AddSingleton<AppSettings>();
             services.AddSingleton<ViewsProvider>();
-            services.AddSingleton<DoManager>();
+            services.AddSingleton<DownloadService>();
 
             services.AddTransient<IDownloadClient, DownloadClientTest>();
 
@@ -38,8 +37,6 @@ namespace ImagesDownloader
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            var doManager = _serviceProvider.GetRequiredService<DoManager>();
-            doManager.TestRun();
             new Views.MainWindow().Show();
         }
 

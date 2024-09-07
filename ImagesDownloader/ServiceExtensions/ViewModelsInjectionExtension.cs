@@ -1,11 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-using ImagesDownloader.Interfaces;
-using ImagesDownloader.ViewModels;
-
 namespace ImagesDownloader.ServiceExtensions;
 
-internal static class ViewModelExtensions
+internal static class ViewModelsInjectionExtension
 {
     public static void AddViewModels(this IServiceCollection services)
     {

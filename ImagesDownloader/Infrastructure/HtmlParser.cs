@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace ImagesDownloader.Common;
+namespace ImagesDownloader.Infrastructure;
 
 internal class HtmlParser
 {
