@@ -2,7 +2,7 @@
 
 using ImagesDownloader.Interfaces;
 using ImagesDownloader.Views;
-using ImagesDownloader.Common;
+using ImagesDownloader.Models;
 
 namespace ImagesDownloader.Services;
 

@@ -1,7 +1,6 @@
 ﻿using ImagesDownloader.Interfaces;
 using ImagesDownloader.Models;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 
 namespace ImagesDownloader.Services.Downloading;
 
@@ -22,7 +21,7 @@ internal class DoManager
             new([
                 new(new Uri("https://yandex1.ru"), "yadir1"),
                 new(new Uri("https://yandex2.ru"), "yadir2"),
-                new(new Uri("https://vk.ru"), "vk"),
+                new(new Uri("https://vk.com"), "vk"),
                 new(new Uri("https://yandex3.ru"), "yadir3")
             ]),
 
@@ -37,7 +36,7 @@ internal class DoManager
 
         using var downloadClient = _serviceProvider.GetRequiredService<IDownloadClient>();
         var doPool = new DoPool(
-            poolSize: 4,
+            poolSize: 2,
             sleepTime: 2000,
             collections: all,
             downloadClient: downloadClient,
@@ -48,7 +47,7 @@ internal class DoManager
             if (e.IsSuccess)
                 _logger.LogInformation(log);
             else
-                _logger.LogError() // TODO
+                _logger.LogError(e.Exception!, "DoManager.TestRun()", e.Item);
         };
         doPool.Wait();
         doPool.Dispose();

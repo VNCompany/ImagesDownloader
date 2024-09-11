@@ -99,7 +99,6 @@ internal class DoPool : IDisposable
                 if (!info.Item.IsSuccess)
                     info.Exception = ex;
             }
-            info.Item.IsSuccess = info.IsSuccess;
             ItemDownloaded?.Invoke(this, info);
         }
     }

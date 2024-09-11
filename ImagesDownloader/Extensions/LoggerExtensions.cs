@@ -15,15 +15,18 @@ internal static class LoggerExtensions
     public static void LogError(this ILogger logger, object state, string? scope = null)
         => logger.Log(
             LogLevel.FAIL,
-            scope == null ? (state.ToString() ?? string.Empty) 
-                          : string.Format("Source: {0}. Message: {1}", scope, state));
+            string.Format("Target: {0}. \n\tMessage: {1}", scope ?? "Application", state.ToString() ?? string.Empty));
 
-    public static void LogError(this ILogger logger, Exception exception, string? scope = null)
+    public static void LogError(
+        this ILogger logger, 
+        Exception exception, string? scope = null, object? details = null)
     {
-        var sb = new StringBuilder();
-        if (scope != null)
-            sb.Append(string.Concat("Source: ", scope, " "));
-        sb.Append(string.Format("Exception: {0}. Message: {1}", exception.GetType().Name, exception.Message));
-        logger.Log(LogLevel.FAIL, sb.ToString());
+        string log = string.Format("Target: {0}. \n\tException: {1}. \n\tMessage: {2}",
+            scope ?? "Application",
+            exception.GetType().Name,
+            exception.Message);
+        if (details != null)
+            log += string.Concat(" \n\tDetails: " + details.ToString());
+        logger.Log(LogLevel.FAIL, log);
     }
 }
