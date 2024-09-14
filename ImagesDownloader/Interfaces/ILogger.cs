@@ -1,8 +1,8 @@
 ﻿namespace ImagesDownloader.Interfaces;
 
-enum LogLevel { INFO, WARN, FAIL }
+public enum LogLevel { INFO, WARN, FAIL }
 
-internal interface ILogger
+public interface ILogger
 {
     void Log(LogLevel logLevel, string message);
 }

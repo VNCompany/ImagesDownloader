@@ -1,9 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System.Windows;
-
-using ImagesDownloader.Interfaces;
-using ImagesDownloader.Services;
-using ImagesDownloader.Extensions;
+﻿using System.Windows;
 
 namespace ImagesDownloader
 {
@@ -12,37 +7,14 @@ namespace ImagesDownloader
     /// </summary>
     public partial class App : Application
     {
-        private readonly ServiceProvider _serviceProvider;
-
-        public App()
-        {
-            ServiceCollection services = new ServiceCollection();
-            ConfigureServices(services);
-            _serviceProvider = services.BuildServiceProvider();
-
-            DISource.Resolver = vmType => _serviceProvider.GetRequiredService(vmType);
-        }
-
-        private static void ConfigureServices(IServiceCollection services)
-        {
-            services.AddSingleton<ILogger, DebugLogger>();
-            services.AddSingleton<AppSettings>();
-            services.AddSingleton<ViewsProvider>();
-            services.AddSingleton<DownloadService>();
-
-            services.AddTransient<IDownloadClient, DownloadClientTest>();
-
-            services.AddViewModels();
-        }
-
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            new Views.MainWindow().Show();
+            new Views.CollectionConfiguratorWindow().Show();
         }
 
         private void Application_Exit(object sender, ExitEventArgs e)
         {
-            _serviceProvider.Dispose();
+            AppSettings.Instance.Dispose();
         }
     }
 

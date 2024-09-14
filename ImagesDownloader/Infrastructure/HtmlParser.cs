@@ -7,23 +7,10 @@ internal class HtmlParser
     private readonly Regex _regex = new Regex("^(.+)/@([-_A-Za-z0-9]+)$");
     private readonly HtmlAgilityPack.HtmlDocument _doc;
 
-    private HtmlParser(HtmlAgilityPack.HtmlDocument doc)
+    public HtmlParser(string html)
     {
-        _doc = doc;
-    }
-
-    public static HtmlParser? TryCreate(string html)
-    {
-        try
-        {
-            var doc = new HtmlAgilityPack.HtmlDocument();
-            doc.LoadHtml(html);
-            return new HtmlParser(doc);
-        }
-        catch (Exception)
-        {
-            return null;
-        }
+        _doc = new HtmlAgilityPack.HtmlDocument();
+        _doc.LoadHtml(html);
     }
 
     public IEnumerable<string> Parse(string xPath)

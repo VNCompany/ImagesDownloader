@@ -1,0 +1,40 @@
+﻿<Window x:Class="ImagesDownloader.Views.AddCollectionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ImagesDownloader.Views"
+        mc:Ignorable="d"
+        Title="New collection" Height="Auto" Width="400" ResizeMode="NoResize">
+    <Window.Resources>
+        <Style TargetType="TextBox">
+            <Setter Property="FontSize" Value="14" />
+        </Style>
+    </Window.Resources>
+    
+    <StackPanel Margin="5" TextBlock.FontSize="{StaticResource BaseFontSize}">
+        <StackPanel Margin="0,0,0,10">
+            <TextBlock Foreground="#555555">URL:</TextBlock>
+            <TextBox />
+        </StackPanel>
+
+        <StackPanel Margin="0,0,0,10">
+            <TextBlock Foreground="#555555">Content:</TextBlock>
+            <TextBox AcceptsReturn="True" TextWrapping="Wrap" Height="200" VerticalScrollBarVisibility="Visible" />
+        </StackPanel>
+
+        <StackPanel Margin="0,0,0,10">
+            <TextBlock Foreground="#555555">XPath:</TextBlock>
+            <ComboBox IsEditable="True" />
+        </StackPanel>
+
+        <Grid Margin="70,0,70,0" Height="35">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Margin="5">Parse</Button>
+            <Button Grid.Column="1" Margin="5">Parse and save</Button>
+        </Grid>
+    </StackPanel>
+</Window>

@@ -3,7 +3,7 @@ using ImagesDownloader.Models;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
-namespace ImagesDownloader.Services.Downloading;
+namespace ImagesDownloader.Infrastructure.Downloading;
 
 internal class DoManager
 {
@@ -22,7 +22,7 @@ internal class DoManager
             new([
                 new(new Uri("https://yandex1.ru"), "yadir1"),
                 new(new Uri("https://yandex2.ru"), "yadir2"),
-                new(new Uri("https://vk.ru"), "vk"),
+                new(new Uri("https://vk.com"), "vk"),
                 new(new Uri("https://yandex3.ru"), "yadir3")
             ]),
 
@@ -35,21 +35,26 @@ internal class DoManager
         ];
         all.Reverse();
 
-        using var downloadClient = _serviceProvider.GetRequiredService<IDownloadClient>();
+        using var cancellationSource = new CancellationTokenSource();
+        using var downloadClient = _serviceProvider.GetRequiredService<IDownloader>();
         var doPool = new DoPool(
-            poolSize: 4,
-            sleepTime: 2000,
+            poolSize: 2,
+            sleepTime: 500,
             collections: all,
             downloadClient: downloadClient,
-            CancellationToken.None);
+            cancellationSource.Token);
         doPool.ItemDownloaded += (s, e) =>
         {
             string log = $"ItemDownloaded event triggered: {e.Item}";
             if (e.IsSuccess)
-                _logger.LogInformation(log);
+                _logger.LogInformation("Item downloaded: {0}", e.Item);
             else
-                _logger.LogError() // TODO
+                _logger.LogError(e.Exception!, e.Item);
         };
+
+        Thread.Sleep(1000);
+        cancellationSource.Cancel();
+
         doPool.Wait();
         doPool.Dispose();
     }

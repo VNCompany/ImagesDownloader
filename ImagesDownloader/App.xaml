@@ -6,6 +6,6 @@
              Startup="Application_Startup"
              Exit="Application_Exit">
     <Application.Resources>
-
+        <sys:Double x:Key="BaseFontSize">14</sys:Double>
     </Application.Resources>
 </Application>

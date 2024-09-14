@@ -9,21 +9,26 @@ internal static class LoggerExtensions
     public static void LogInformation(this ILogger logger, object state)
         => logger.Log(LogLevel.INFO, state.ToString() ?? string.Empty);
 
+    public static void LogInformation(this ILogger logger, string format, params object[] args)
+        => logger.Log(LogLevel.INFO, string.Format(format, args));
+
     public static void LogWarning(this ILogger logger, object state)
         => logger.Log(LogLevel.WARN, state.ToString() ?? string.Empty);
 
-    public static void LogError(this ILogger logger, object state, string? scope = null)
-        => logger.Log(
-            LogLevel.FAIL,
-            scope == null ? (state.ToString() ?? string.Empty) 
-                          : string.Format("Source: {0}. Message: {1}", scope, state));
+    public static void LogWarning(this ILogger logger, string format, params object[] args)
+        => logger.Log(LogLevel.WARN, string.Format(format, args));
 
-    public static void LogError(this ILogger logger, Exception exception, string? scope = null)
+    public static void LogError(this ILogger logger, object state)
+        => logger.Log(LogLevel.FAIL, state.ToString() ?? string.Empty);
+
+    public static void LogError(this ILogger logger, string format, params object[] args)
+        => logger.Log(LogLevel.FAIL, string.Format(format, args));
+
+    public static void LogError(this ILogger logger, Exception exception, object? details = null)
     {
-        var sb = new StringBuilder();
-        if (scope != null)
-            sb.Append(string.Concat("Source: ", scope, " "));
-        sb.Append(string.Format("Exception: {0}. Message: {1}", exception.GetType().Name, exception.Message));
+        StringBuilder sb = new StringBuilder($"{exception.GetType().Name} thrown. {exception.Message}.");
+        if (details != null)
+            sb.Append("\n\t" + details);
         logger.Log(LogLevel.FAIL, sb.ToString());
     }
 }

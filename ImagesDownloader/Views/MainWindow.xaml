@@ -3,15 +3,83 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:ImagesDownloader.Views"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <DockPanel>
-        <ToolBar DockPanel.Dock="Top">
+        Title="MainWindow" Height="450" Width="800" MinHeight="300" MinWidth="400">
+
+    <Window.Resources>
+        <local:TestCollection x:Key="testCollection" />
+        <local:TestMainCollection x:Key="testMainCollection" />
+    </Window.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition MinHeight="100" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition MinHeight="50" />
+        </Grid.RowDefinitions>
+
+        <ToolBar Grid.Row="0" TextBlock.FontSize="{StaticResource BaseFontSize}">
             <Button>Add</Button>
+            <Separator />
             <Button>Start</Button>
             <Button>Stop</Button>
         </ToolBar>
-        <ListView DockPanel.Dock="Bottom" />
-    </DockPanel>
+
+        <ListView Grid.Row="1" 
+                  TextBlock.FontSize="{StaticResource BaseFontSize}" 
+                  ItemsSource="{StaticResource testMainCollection}">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Link" Width="250" DisplayMemberBinding="{Binding Item1, Mode=OneWay}" />
+                    <GridViewColumn Header="Progress" Width="150">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <ProgressBar Height="16" Value="{Binding Item2, Mode=OneWay}" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Percent" Width="80" 
+                                    DisplayMemberBinding="{Binding Item2, StringFormat={}{0:F2}%, Mode=OneWay}" />
+                    <GridViewColumn Header="Counter" Width="150">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock>
+                                    <Run Text="{Binding Item4, Mode=OneWay}" />
+                                    <Run Text="/" />
+                                    <Run Text="{Binding Item5, Mode=OneWay}" />
+                                </TextBlock>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <GridSplitter Grid.Row="2" Height="3" HorizontalAlignment="Stretch" />
+
+        <ListBox Grid.Row="3" ItemsSource="{StaticResource testCollection}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <Ellipse Name="ellipse" Width="10" Height="10" Fill="Green" VerticalAlignment="Center" />
+                        <TextBlock FontSize="{StaticResource BaseFontSize}" Margin="5,0,0,0" Text="{Binding Item1}" />
+                    </StackPanel>
+
+                    <DataTemplate.Triggers>
+                        <DataTrigger Binding="{Binding Item2}" Value="False">
+                            <Setter TargetName="ellipse" Property="Ellipse.Fill" Value="Red" />
+                        </DataTrigger>
+                    </DataTemplate.Triggers>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Grid>
 </Window>

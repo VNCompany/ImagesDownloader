@@ -1,6 +1,6 @@
 ﻿using ImagesDownloader.Models;
 
-namespace ImagesDownloader.Services.Downloading;
+namespace ImagesDownloader.Infrastructure.Downloading;
 
 internal class DoInfo(DownloadItemCollection collection, DownloadItem item)
 {

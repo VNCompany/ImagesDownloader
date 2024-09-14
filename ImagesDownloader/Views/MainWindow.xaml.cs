@@ -24,4 +24,23 @@ namespace ImagesDownloader.Views
             InitializeComponent();
         }
     }
+
+    public class TestCollection : List<Tuple<string, bool>>
+    {
+        public TestCollection() : base([
+            new("https://vk.com", true),
+            new("https://vk.com/eorigjeoirg/erg/wef/w/eg/ewr/ge/rwefwe/fgw", false),
+            new("https://vk.com", false),
+            new("https://vk.com", true),
+        ]) { }
+    }
+
+    public class TestMainCollection : List<Tuple<string, double, string, int, int>>
+    {
+        public TestMainCollection() : base([
+            new("https://vk.com/eorigjeoirg/erg/wef/w/eg/ewr/ge/rwefwe/fgw", 70.32, "Downloading", 12, 35),
+            new("https://vk.com/sfcc", 100, "Idle", 16, 16),
+            new("https://vk.com", 0, "Idle", 0, 105),
+        ]) { }
+    }
 }

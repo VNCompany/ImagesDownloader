@@ -3,15 +3,15 @@
 using ImagesDownloader.Interfaces;
 using ImagesDownloader.Models;
 
-namespace ImagesDownloader.Services.Downloading;
+namespace ImagesDownloader.Infrastructure.Downloading;
 
 internal class DoPool : IDisposable
 {
     public event EventHandler<DoInfo>? ItemDownloaded;
 
     private readonly int _sleepTime;
-    private readonly List<DownloadItemCollection> _collections;
-    private readonly IDownloadClient _downloadClient;
+    private readonly List<(DownloadItemCollection, CancellationTokenSource)> _collections;
+    private readonly IDownloader _downloadClient;
     private readonly CancellationToken _mainCancellationToken;
     private readonly SemaphoreSlim _resourcesSemaphore = new(1);
     private readonly Dictionary<DownloadItemCollection, CancellationTokenSource> _cancellationSources;
@@ -22,7 +22,7 @@ internal class DoPool : IDisposable
         int poolSize,
         int sleepTime,
         List<DownloadItemCollection> collections, 
-        IDownloadClient downloadClient, 
+        IDownloader downloadClient, 
         CancellationToken cancellationToken)
     {
         _sleepTime = sleepTime;
@@ -90,7 +90,7 @@ internal class DoPool : IDisposable
                 info.Item.IsSuccess = true;
                 await Task.Delay(_sleepTime, _mainCancellationToken);
             }
-            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            catch (OperationCanceledException) when (_mainCancellationToken.IsCancellationRequested)
             {
                 break;
             }
@@ -99,7 +99,6 @@ internal class DoPool : IDisposable
                 if (!info.Item.IsSuccess)
                     info.Exception = ex;
             }
-            info.Item.IsSuccess = info.IsSuccess;
             ItemDownloaded?.Invoke(this, info);
         }
     }
