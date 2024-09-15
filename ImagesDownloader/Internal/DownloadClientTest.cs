@@ -6,6 +6,9 @@ internal class DownloadClientTest : IDownloader
 {
     private readonly ILogger _logger = LoggerFactory.Logger;
 
+    public async Task<string> GetHtml(Uri uri, CancellationToken cancellationToken)
+        => await System.IO.File.ReadAllTextAsync("C:\\test.html", cancellationToken);
+
     public async Task SaveData(Uri uri, string outputPath, CancellationToken cancellationToken)
     {
         string v = uri.ToString();
