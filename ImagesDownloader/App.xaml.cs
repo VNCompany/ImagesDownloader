@@ -9,7 +9,7 @@ namespace ImagesDownloader
     {
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            new Views.CollectionConfiguratorWindow().Show();
+            new Views.AddCollectionWindow().Show();
         }
 
         private void Application_Exit(object sender, ExitEventArgs e)

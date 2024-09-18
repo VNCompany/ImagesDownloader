@@ -3,38 +3,60 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ImagesDownloader.Views"
+        xmlns:vm="clr-namespace:ImagesDownloader.ViewModels"
+        xmlns:validators="clr-namespace:ImagesDownloader.ValidationRules"
+        xmlns:conv="clr-namespace:ImagesDownloader.ValueConverters"
         mc:Ignorable="d"
-        Title="New collection" Height="Auto" Width="400" ResizeMode="NoResize">
+        Title="New collection" Height="350" Width="400" ResizeMode="NoResize">
+    <Window.DataContext>
+        <vm:AddCollectionVM></vm:AddCollectionVM>
+    </Window.DataContext>
+    
     <Window.Resources>
         <Style TargetType="TextBox">
-            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontSize" Value="{StaticResource BaseFontSize}" />
         </Style>
     </Window.Resources>
     
-    <StackPanel Margin="5" TextBlock.FontSize="{StaticResource BaseFontSize}">
-        <StackPanel Margin="0,0,0,10">
-            <TextBlock Foreground="#555555">URL:</TextBlock>
-            <TextBox />
-        </StackPanel>
+    <Grid Margin="5" TextBlock.FontSize="{StaticResource BaseFontSize}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
 
-        <StackPanel Margin="0,0,0,10">
-            <TextBlock Foreground="#555555">Content:</TextBlock>
-            <TextBox AcceptsReturn="True" TextWrapping="Wrap" Height="200" VerticalScrollBarVisibility="Visible" />
-        </StackPanel>
+        <TextBlock Margin="0,5,0,0">URL:</TextBlock>
+        <TextBox Grid.Row="1" KeyDown="TextBox_KeyDown">
+            <TextBox.Text>
+                <Binding Path="Url" UpdateSourceTrigger="Explicit">
+                    <Binding.ValidationRules>
+                        <validators:AbsoluteUriValidationRule />
+                    </Binding.ValidationRules>
+                    <Binding.Converter>
+                        <conv:UriToStringConverter />
+                    </Binding.Converter>
+                </Binding>
+            </TextBox.Text>
+        </TextBox>
 
-        <StackPanel Margin="0,0,0,10">
-            <TextBlock Foreground="#555555">XPath:</TextBlock>
-            <ComboBox IsEditable="True" />
-        </StackPanel>
+        <TextBlock Grid.Row="2" Margin="0,5,0,0">Content:</TextBlock>
+        <TextBox Grid.Row="3" AcceptsReturn="True" TextWrapping="Wrap"
+                 VerticalScrollBarVisibility="Visible" 
+                 Text="{Binding Html, UpdateSourceTrigger=PropertyChanged}"/>
 
-        <Grid Margin="70,0,70,0" Height="35">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Margin="5">Parse</Button>
-            <Button Grid.Column="1" Margin="5">Parse and save</Button>
-        </Grid>
-    </StackPanel>
+        <TextBlock Grid.Row="4" Margin="0,5,0,0">XPath:</TextBlock>
+        <ComboBox Grid.Row="5"
+                  IsEditable="True"
+                  ItemsSource="{Binding XPathHistory, Mode=OneWay}" 
+                  Text="{Binding XPath, UpdateSourceTrigger=PropertyChanged}" />
+
+        <WrapPanel Grid.Row="6" HorizontalAlignment="Center">
+            <Button Grid.Column="0" Margin="5" Width="110" Command="{Binding Parse}">Parse</Button>
+            <Button Grid.Column="1" Margin="5" Width="110" Command="{Binding Parse}">Parse and save</Button>
+        </WrapPanel>
+    </Grid>
 </Window>
