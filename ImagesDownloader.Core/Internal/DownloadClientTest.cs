@@ -1,7 +1,9 @@
-﻿using ImagesDownloader.Interfaces;
-using ImagesDownloader.Exceptions;
+﻿using ImagesDownloader.Core.Interfaces;
+using ImagesDownloader.Core.Factories;
+using ImagesDownloader.Core.Exceptions;
+using ImagesDownloader.Core.Extensions;
 
-namespace ImagesDownloader.Internal;
+namespace ImagesDownloader.Core.Internal;
 
 internal class DownloadClientTest : IDownloader
 {
@@ -15,20 +17,19 @@ internal class DownloadClientTest : IDownloader
         try
         {
             string v = uri.ToString();
-            _logger.LogInformation("Download: {0}", v);
+            _logger.Info("Download: {0}", v);
             await Task.Delay(1000, cancellationToken);
             if (v.Contains("vk.com", StringComparison.OrdinalIgnoreCase))
                 throw new OperationCanceledException("Timeout exception message", new TimeoutException());
-            _logger.LogInformation("Save {0} to {1}", v, outputPath);
+            _logger.Info("Save {0} to {1}", v, outputPath);
             await Task.Delay(100, cancellationToken);
         }
         catch (Exception ex)
         {
-            var type = (ex is OperationCanceledException { InnerException: not TimeoutException })
-                ? SaveDataExceptionType.TaskCanceled : SaveDataExceptionType.Other;
-            throw new SaveDataException(type, ex.Message, ex);
+            var type = ex is OperationCanceledException { InnerException: not TimeoutException };
+            throw new DownloadDataException(type, ex.Message, ex);
         }
     }
 
-    public void Dispose() => _logger.LogInformation("Download client disposed");
+    public void Dispose() => _logger.Info("Download client disposed");
 }

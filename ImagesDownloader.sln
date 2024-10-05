@@ -5,6 +5,10 @@ VisualStudioVersion = 17.10.35013.160
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ImagesDownloader", "ImagesDownloader\ImagesDownloader.csproj", "{B1249D23-3BC4-477B-87BD-4B6F0C421F65}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImagesDownloader.Core", "ImagesDownloader.Core\ImagesDownloader.Core.csproj", "{591744AE-C5C9-41CC-94DF-258EAB810B62}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImagesDownloader.Tests", "ImagesDownloader.Tests\ImagesDownloader.Tests.csproj", "{708BC4AA-E402-4110-9CBE-17FDA238BBC5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{B1249D23-3BC4-477B-87BD-4B6F0C421F65}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B1249D23-3BC4-477B-87BD-4B6F0C421F65}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B1249D23-3BC4-477B-87BD-4B6F0C421F65}.Release|Any CPU.Build.0 = Release|Any CPU
+		{591744AE-C5C9-41CC-94DF-258EAB810B62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{591744AE-C5C9-41CC-94DF-258EAB810B62}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{591744AE-C5C9-41CC-94DF-258EAB810B62}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{591744AE-C5C9-41CC-94DF-258EAB810B62}.Release|Any CPU.Build.0 = Release|Any CPU
+		{708BC4AA-E402-4110-9CBE-17FDA238BBC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{708BC4AA-E402-4110-9CBE-17FDA238BBC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{708BC4AA-E402-4110-9CBE-17FDA238BBC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{708BC4AA-E402-4110-9CBE-17FDA238BBC5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

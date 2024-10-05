@@ -1,4 +1,4 @@
-﻿namespace ImagesDownloader.Interfaces;
+﻿namespace ImagesDownloader.Core.Interfaces;
 
 public enum LogLevel { INFO, WARN, FAIL }
 

@@ -1,6 +1,6 @@
-﻿using ImagesDownloader.Interfaces;
+﻿using ImagesDownloader.Core.Interfaces;
 
-namespace ImagesDownloader.Internal;
+namespace ImagesDownloader.Core.Internal;
 
 internal class LoggerDebug : ILogger
 {
