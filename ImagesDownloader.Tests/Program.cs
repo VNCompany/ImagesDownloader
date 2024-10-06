@@ -15,7 +15,7 @@ internal class Program
 
         using SemaphoreSlim ss = new SemaphoreSlim(1);
         using CancellationTokenSource cts = new CancellationTokenSource();
-        var task = dic.Download(ss, 1, cts.Token);
+        var task = dic.Download(ss, 2, cts.Token);
         Thread.Sleep(1000);
         cts.Cancel();
         task.Wait();

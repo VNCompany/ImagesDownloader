@@ -24,7 +24,8 @@ public class DItem(Uri source, string outputPath)
         }
         catch (Exception ex)
         {
-            if (ex is not DownloadDataException ddex || !ddex.IsTaskCanceled)
+            if (ex is not OperationCanceledException 
+                || ex is not DownloadDataException { IsTaskCanceled: true })
             {
                 IsSuccess = false;
                 callback.Invoke(new DItemDownloadedArgs(this, ex));
