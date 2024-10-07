@@ -4,7 +4,7 @@ using ImagesDownloader.Core.Interfaces;
 
 namespace ImagesDownloader.Core.Extensions;
 
-internal static class LoggerExtensions
+public static class LoggerExtensions
 {
     public static void Info(this ILogger logger, object state)
         => logger.Log(LogLevel.INFO, state.ToString() ?? string.Empty);

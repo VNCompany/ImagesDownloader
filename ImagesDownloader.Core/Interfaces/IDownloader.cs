@@ -16,6 +16,5 @@ public interface IDownloader : IDisposable
     /// <param name="uri">URL</param>
     /// <param name="outputPath">Путь сохранения</param>
     /// <param name="cancellationToken">Токен отмены</param>
-    /// <exception cref="SaveDataException"><see cref="SaveDataException.Type"/></exception>
     Task SaveData(Uri uri, string outputPath, CancellationToken cancellationToken);
 }

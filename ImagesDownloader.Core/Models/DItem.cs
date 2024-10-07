@@ -1,4 +1,5 @@
-﻿using ImagesDownloader.Core.Exceptions;
+﻿using ImagesDownloader.Core.Extensions;
+using ImagesDownloader.Core.Factories;
 using ImagesDownloader.Core.Interfaces;
 
 namespace ImagesDownloader.Core.Models;
@@ -18,22 +19,25 @@ public class DItem(Uri source, string outputPath)
         try
         {
             await semaphore.WaitAsync(cancellationToken);
-            await downloader.SaveData(Source, OutputPath, cancellationToken);
-            IsSuccess = true;
-            callback.Invoke(new DItemDownloadedArgs(this, null));
+            try
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                await downloader.SaveData(Source, OutputPath, cancellationToken);
+                IsSuccess = true;
+                callback.Invoke(new DItemDownloadedArgs(this, null));
+            }
+            finally
+            {
+                semaphore.Release();
+            }
         }
         catch (Exception ex)
         {
-            if (ex is not OperationCanceledException 
-                || ex is not DownloadDataException { IsTaskCanceled: true })
+            if (ex is not OperationCanceledException)
             {
                 IsSuccess = false;
                 callback.Invoke(new DItemDownloadedArgs(this, ex));
             }
-        }
-        finally
-        {
-            semaphore.Release();
         }
     }
 

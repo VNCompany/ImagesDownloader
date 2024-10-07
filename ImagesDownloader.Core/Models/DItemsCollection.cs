@@ -24,19 +24,23 @@ public class DItemsCollection(string name, IEnumerable<DItem> items) : INotifyPr
         try
         {
             await semaphore.WaitAsync(cancellationToken);
-            using var itemsSemaphore = new SemaphoreSlim(poolSize);
-            using var downloader = DownloaderFactory.CreateDownloader();
-            var tasks = new List<Task>();
-            foreach (var item in Items.Where(x => x.IsSuccess == null))
-                tasks.Add(item.Download(downloader, itemsSemaphore, cancellationToken, callback: OnItemDownloaded));
-            await Task.WhenAll(tasks);
+            try
+            {
+                using var itemsSemaphore = new SemaphoreSlim(poolSize);
+                using var downloader = DownloaderFactory.CreateDownloader();
+                var tasks = new List<Task>();
+                foreach (var item in Items.Where(x => x.IsSuccess == null))
+                    tasks.Add(item.Download(downloader, itemsSemaphore, cancellationToken, callback: OnItemDownloaded));
+                await Task.WhenAll(tasks);
+            }
+            finally
+            {
+                semaphore.Release();
+            }
         }
         catch (OperationCanceledException)
         {
-        }
-        finally
-        {
-            semaphore.Release();
+            //_logger.Warn("Download collection \"{0}\" has been canceled", Name);
         }
     }
 
