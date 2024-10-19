@@ -21,17 +21,17 @@ internal class Program
             cc[i] = new DItemsCollection(Faker.Lorem.Sentence(2), ci);
         }
 
-        using SemaphoreSlim ss = new SemaphoreSlim(2);
-        using CancellationTokenSource cts = new CancellationTokenSource();
-        var tasks = cc.Select(x => x.Download(ss, 2, cts.Token)).ToArray();
+        var dman = new DManager(2, 2);
+        dman.Start(cc);
 
         Console.CancelKeyPress += (s, e) =>
         {
-            e.Cancel = true;
-            cts.Cancel();
-            LoggerFactory.Logger.Warn("Cancellation requested");
+            dman.Stop();
         };
 
-        Task.WaitAll(tasks);
+        while (dman.IsRunning)
+            Thread.Sleep(100);
+
+        dman.Stop();
     }
 }

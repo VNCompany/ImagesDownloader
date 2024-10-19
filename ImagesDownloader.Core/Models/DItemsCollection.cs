@@ -40,7 +40,6 @@ public class DItemsCollection(string name, IEnumerable<DItem> items) : INotifyPr
         }
         catch (OperationCanceledException)
         {
-            //_logger.Warn("Download collection \"{0}\" has been canceled", Name);
         }
     }
 

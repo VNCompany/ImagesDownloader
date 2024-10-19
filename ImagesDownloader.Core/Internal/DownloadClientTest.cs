@@ -23,9 +23,10 @@ internal class DownloadClientTest : IDownloader
             _logger.Info("Save {0} to {1}", v, outputPath);
             await Task.Delay(500, cancellationToken);
         }
-        catch (OperationCanceledException ex) when (ex.InnerException is TimeoutException tex)
+        catch (OperationCanceledException ex)
         {
-            throw tex;
+            if (ex.InnerException is TimeoutException tex)
+                throw tex;
         }
     }
 
