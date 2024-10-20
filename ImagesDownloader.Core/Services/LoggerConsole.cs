@@ -1,6 +1,6 @@
 ﻿using ImagesDownloader.Core.Interfaces;
 
-namespace ImagesDownloader.Core.Internal;
+namespace ImagesDownloader.Core.Services;
 
 internal class LoggerConsole : ILogger
 {

@@ -15,22 +15,13 @@ using System.Windows.Shapes;
 namespace ImagesDownloader.Views
 {
     /// <summary>
-    /// Логика взаимодействия для AddCollectionWindow.xaml
+    /// Логика взаимодействия для CollectionWindow.xaml
     /// </summary>
-    public partial class AddCollectionWindow : Window
+    public partial class CollectionWindow : Window
     {
-        public AddCollectionWindow()
+        public CollectionWindow()
         {
             InitializeComponent();
-        }
-
-        private void TextBox_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter)
-            {
-                var tb = (sender as TextBox)!;
-                tb.GetBindingExpression(TextBox.TextProperty).UpdateSource();
-            }
         }
     }
 }

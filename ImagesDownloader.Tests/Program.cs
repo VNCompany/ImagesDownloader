@@ -1,6 +1,4 @@
-﻿using ImagesDownloader.Core.Factories;
-using ImagesDownloader.Core.Extensions;
-using ImagesDownloader.Core.Models;
+﻿using ImagesDownloader.Core.Models;
 
 namespace ImagesDownloader.Tests;
 
@@ -8,7 +6,7 @@ internal class Program
 {
     static void Main(string[] args)
     {
-        const int collectionsCount = 10;
+        const int collectionsCount = 4;
         var rnd = new Random();
         var userName = Faker.Name.First();
 
@@ -22,16 +20,12 @@ internal class Program
         }
 
         var dman = new DManager(2, 2);
-        dman.Start(cc);
-
         Console.CancelKeyPress += (s, e) =>
         {
+            e.Cancel = true;
             dman.Stop();
         };
-
-        while (dman.IsRunning)
-            Thread.Sleep(100);
-
-        dman.Stop();
+        dman.Start(cc);
+        dman.Wait();
     }
 }

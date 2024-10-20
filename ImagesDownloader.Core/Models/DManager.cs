@@ -1,11 +1,10 @@
 ﻿namespace ImagesDownloader.Core.Models;
 
-public class DManager(int collectionsPoolSize, int itemsPoolSize) : IDisposable
+public class DManager(int collectionsPoolSize, int itemsPoolSize)
 {
     private readonly Dictionary<DItemsCollection, CancellationTokenSource> _collections = [];
-    private readonly List<Task> _tasks = [];
-    private readonly SemaphoreSlim _semaphore = new(collectionsPoolSize);
 
+    private Task? _currentTask;
     private CancellationTokenSource? _tokenSource;
 
     public bool IsRunning { get; private set; }
@@ -15,47 +14,44 @@ public class DManager(int collectionsPoolSize, int itemsPoolSize) : IDisposable
         if (IsRunning) 
             throw new InvalidOperationException("Failed to start. Downloading already started");
 
-        _tokenSource = new CancellationTokenSource();
+        _currentTask = StartTasks(items);
+    }
 
-        foreach (var collection in items)
+    public void Wait() => _currentTask?.Wait();
+
+    public void Stop() => _tokenSource?.Cancel();
+
+    private async Task StartTasks(IEnumerable<DItemsCollection> collections)
+    {
+        var tasks = new List<Task>();
+
+        _tokenSource = new CancellationTokenSource();
+        using var semaphore = new SemaphoreSlim(collectionsPoolSize);
+        foreach (var collection in collections)
         {
-            var collectionCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(
-                _tokenSource.Token);
-            _collections[collection] = collectionCancellationTokenSource;
-            _tasks.Add(collection.Download(_semaphore, itemsPoolSize, collectionCancellationTokenSource.Token));
+            var cts = CancellationTokenSource.CreateLinkedTokenSource(_tokenSource.Token);
+            _collections[collection] = cts;
+            tasks.Add(collection.Download(semaphore, itemsPoolSize, cts.Token));
         }
 
         IsRunning = true;
-    }
+        Console.WriteLine("IsRunning is true");
+        await Task.WhenAll(tasks);
+        Console.WriteLine("Task is completed");
 
-    public void Stop()
-    {
-        if (_tokenSource != null)
-        {
-            _tokenSource.Cancel();
-            _tokenSource.Dispose();
-            _tokenSource = null;
-        }
-
-        if (_tasks.Count > 0)
-        {
-            Task.WhenAll(_tasks).Wait();
-            _tasks.Clear();
-        }
-
-        if (_collections.Count > 0)
-        {
-            foreach (var cancellationTokenSource in _collections.Values)
-                cancellationTokenSource.Dispose();
-            _collections.Clear();
-        }
-
+        Clear();
+        Console.WriteLine("Clear()");
         IsRunning = false;
+        Console.WriteLine("IsRunning is false");
     }
 
-    public void Dispose()
+    private void Clear()
     {
-        Stop();
-        _semaphore.Dispose();
+        foreach (var cancellationTokenSource in _collections.Values)
+            cancellationTokenSource.Dispose();
+        _collections.Clear();
+
+        _tokenSource?.Dispose();
+        _tokenSource = null;
     }
 }

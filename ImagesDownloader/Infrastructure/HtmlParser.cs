@@ -25,7 +25,7 @@ internal class HtmlParser
 
         var nodes = _doc.DocumentNode.SelectNodes(xPath);
         if (nodes == null || nodes.Count == 0)
-            return Enumerable.Empty<string>();
+            return [];
 
         return attr == null
             ? nodes.Select(x => x.InnerHtml)

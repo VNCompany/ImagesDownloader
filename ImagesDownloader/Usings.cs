@@ -1,2 +1,2 @@
-﻿global using ImagesDownloader.Infrastructure;
-global using ImagesDownloader.Extensions;
+﻿global using ImagesDownloader.Core;
+global using ImagesDownloader.Infrastructure;

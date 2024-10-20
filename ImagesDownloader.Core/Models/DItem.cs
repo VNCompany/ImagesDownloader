@@ -1,6 +1,4 @@
-﻿using ImagesDownloader.Core.Extensions;
-using ImagesDownloader.Core.Factories;
-using ImagesDownloader.Core.Interfaces;
+﻿using ImagesDownloader.Core.Interfaces;
 
 namespace ImagesDownloader.Core.Models;
 

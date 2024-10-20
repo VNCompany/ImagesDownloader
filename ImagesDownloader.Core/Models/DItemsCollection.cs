@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Collections.ObjectModel;
+using Microsoft.Extensions.DependencyInjection;
 
-using ImagesDownloader.Core.Factories;
 using ImagesDownloader.Core.Interfaces;
 using ImagesDownloader.Core.Extensions;
 
@@ -11,7 +11,7 @@ public class DItemsCollection(string name, IEnumerable<DItem> items) : INotifyPr
 {
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    private readonly ILogger _logger = LoggerFactory.Logger;
+    private readonly ILogger _logger = ServiceAccessor.GetRequiredService<ILogger>();
 
     public string Name { get; set; } = name;
     public ICollection<DItem> Items { get; set; } = (items as ICollection<DItem>) ?? items.ToArray();
@@ -27,7 +27,7 @@ public class DItemsCollection(string name, IEnumerable<DItem> items) : INotifyPr
             try
             {
                 using var itemsSemaphore = new SemaphoreSlim(poolSize);
-                using var downloader = DownloaderFactory.CreateDownloader();
+                using var downloader = ServiceAccessor.GetRequiredService<IDownloader>();
                 var tasks = new List<Task>();
                 foreach (var item in Items.Where(x => x.IsSuccess == null))
                     tasks.Add(item.Download(downloader, itemsSemaphore, cancellationToken, callback: OnItemDownloaded));
@@ -40,6 +40,7 @@ public class DItemsCollection(string name, IEnumerable<DItem> items) : INotifyPr
         }
         catch (OperationCanceledException)
         {
+            _logger.Warn("OperationCanceledException thrown");
         }
     }
 

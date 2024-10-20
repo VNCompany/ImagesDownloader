@@ -1,12 +1,11 @@
 ﻿using ImagesDownloader.Core.Interfaces;
-using ImagesDownloader.Core.Factories;
 using ImagesDownloader.Core.Extensions;
 
-namespace ImagesDownloader.Core.Internal;
+namespace ImagesDownloader.Core.Services;
 
 internal class DownloadClientTest : IDownloader
 {
-    private readonly ILogger _logger = LoggerFactory.Logger;
+    private readonly ILogger _logger = ServiceAccessor.GetRequiredService<ILogger>();
 
     public async Task<string> GetHtml(Uri uri, CancellationToken cancellationToken)
         => await File.ReadAllTextAsync("C:\\test.html", cancellationToken);

@@ -10,9 +10,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.61" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.67" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ImagesDownloader.Core\ImagesDownloader.Core.csproj" />
   </ItemGroup>
 
 </Project>
