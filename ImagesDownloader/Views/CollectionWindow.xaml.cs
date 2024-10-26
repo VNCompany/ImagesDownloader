@@ -1,16 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
+﻿using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+using System.Windows.Controls;
+
+using ImagesDownloader.ViewModels;
+using System.Windows.Data;
 
 namespace ImagesDownloader.Views
 {
@@ -22,6 +15,28 @@ namespace ImagesDownloader.Views
         public CollectionWindow()
         {
             InitializeComponent();
+
+            tbUrl.KeyDown += TbUrl_KeyDown;
+            tbUrl.Focus();
+        }
+
+        private void TbUrl_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                var parameter = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
+                var vm = (DataContext as CollectionVM) ?? throw new InvalidCastException();
+                tbUrl.GetBindingExpression(TextBox.TextProperty).UpdateSource();
+                
+                vm.TrySetHtml(vm.Url).ContinueWith(t =>
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        if (vm.HtmlParse.CanExecute(parameter))
+                            vm.HtmlParse.Execute(parameter);
+                    });
+                });
+            }
         }
     }
 }

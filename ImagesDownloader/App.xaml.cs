@@ -1,5 +1,7 @@
 ﻿using System.Windows;
 
+using ImagesDownloader.Views;
+
 namespace ImagesDownloader
 {
     /// <summary>
@@ -9,12 +11,13 @@ namespace ImagesDownloader
     {
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            new Views.AddCollectionWindow().Show();
+            new CollectionWindow().Show();
+            //new HtmlParserWindow().ShowDialog();
         }
 
         private void Application_Exit(object sender, ExitEventArgs e)
         {
-            AppSettings.Instance.Dispose();
+            ServiceAccessor.Close();
         }
     }
 

@@ -20,11 +20,13 @@ public static class ServiceAccessor
 
     public static IServiceScope CreateScope() => _sp.CreateScope();
 
+    public static void Close() => _sp.Dispose();
+
     private static void ConfigureServices(IServiceCollection services)
     {
-        services.AddSingleton<AppConfig>();
-        services.AddSingleton<ILogger, LoggerConsole>();
-        //services.AddSingleton<ILogger, LoggerDebug>();
+        services.AddSingleton(provider => AppConfig.CreateInstance());
+        //services.AddSingleton<ILogger, LoggerConsole>();
+        services.AddSingleton<ILogger, LoggerDebug>();
 
         services.AddTransient<IDownloader, DownloadClientTest>();
     }
