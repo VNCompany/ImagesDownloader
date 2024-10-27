@@ -1,12 +1,25 @@
-﻿using ImagesDownloader.Core.Interfaces;
+﻿using System.ComponentModel;
+using ImagesDownloader.Core.Interfaces;
 
 namespace ImagesDownloader.Core.Models;
 
-public class DItem(Uri source, string outputPath)
+public class DItem(Uri source, string outputPath) : INotifyPropertyChanged
 {
+    public event PropertyChangedEventHandler? PropertyChanged;
+
     public Uri Source { get; } = source;
     public string OutputPath { get; } = outputPath;
-    public bool? IsSuccess { get; set; }
+
+    private bool? _isSuccess;
+    public bool? IsSuccess
+    {
+        get => _isSuccess;
+        set
+        {
+            _isSuccess = value;
+            PropertyChanged?.Invoke(this, new(nameof(IsSuccess)));
+        }
+    }
 
     public async Task Download(
         IDownloader downloader, 

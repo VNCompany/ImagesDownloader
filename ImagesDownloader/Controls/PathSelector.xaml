@@ -8,6 +8,6 @@
              d:DesignHeight="25" d:DesignWidth="200">
     <DockPanel>
         <Button Width="60" DockPanel.Dock="Right" Margin="5,0,0,0" Click="Button_Click">Select</Button>
-        <TextBox DockPanel.Dock="Left" HorizontalAlignment="Stretch" LostFocus="TextBox_LostFocus" x:Name="TB" />
+        <TextBox DockPanel.Dock="Left" HorizontalAlignment="Stretch" x:Name="TB" />
     </DockPanel>
 </UserControl>

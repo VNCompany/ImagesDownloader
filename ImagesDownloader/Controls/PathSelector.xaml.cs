@@ -24,6 +24,12 @@ namespace ImagesDownloader.Controls
         public PathSelector()
         {
             InitializeComponent();
+            TB.TextChanged += TB_TextChanged;
+        }
+
+        private void TB_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            SelectedPath = TB.Text;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -37,28 +43,18 @@ namespace ImagesDownloader.Controls
                 SelectedPath = dlg.FolderName;
         }
 
-        private void TextBox_LostFocus(object sender, RoutedEventArgs e)
-        {
-            if (TB.Text != SelectedPath)
-            {
-                if (!ValidatePathValue(TB.Text))
-                {
-                    TB.Foreground = Brushes.Red;
-                    return;
-                }
-                else if (TB.Foreground == Brushes.Red)
-                    TB.Foreground = Brushes.Black;
-                SelectedPath = TB.Text;
-            }
-        }
-
         private static void SelectedPath_PropertyChanged(DependencyObject s, DependencyPropertyChangedEventArgs e)
         {
+            var pathSelector = (PathSelector)s!;
             string newValue = (string)e.NewValue;
-            if (ValidatePathValue(newValue) && s is PathSelector control && newValue != control.TB.Text)
-                control.TB.Text = (string)e.NewValue;
+            if (newValue != pathSelector.TB.Text)
+            {
+                if (ValidatePathValue(newValue))
+                {
+                    // TODO
+                }    
+            }
         }
-
 
         private static char[] _invalidPathChars = [.. Path.GetInvalidPathChars(), '*', '?', '"', '<', '>'];
         private static bool ValidatePathValue(string input) => input.IndexOfAny(_invalidPathChars) == -1;

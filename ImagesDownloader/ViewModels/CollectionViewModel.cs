@@ -7,11 +7,12 @@ using ImagesDownloader.Models;
 
 namespace ImagesDownloader.ViewModels;
 
-internal class CollectionVM : ViewModelBase
+internal class CollectionViewModel : ViewModelBase
 {
     private readonly ILogger _logger = ServiceAccessor.GetRequiredService<ILogger>();
     private readonly AppConfig _appConfig = ServiceAccessor.GetRequiredService<AppConfig>();
-    private readonly HtmlParserVM _htmlParserVM = new();
+
+    private HtmlParserViewModel _htmlParserViewModel = new();
 
     #region Properties
     private Uri? _url;
@@ -33,7 +34,6 @@ internal class CollectionVM : ViewModelBase
         {
             SetProperty(ref _name, value);
             Ok.OnCanExecuteChanged();
-            _logger.Info("NAME CHANGED");
         }
     }
 
@@ -42,37 +42,58 @@ internal class CollectionVM : ViewModelBase
     public ObservableCollection<string> FailedItems { get; } = [];
 
     private string _savePath;
-    public string SavePath
+    public string SavePath  // TODO: Make UpdatePropertySource=PropertyChanged
     {
         get => _savePath;
         set
         {
             SetProperty(ref _savePath, value);
             Ok.OnCanExecuteChanged();
-            _logger.Info("SAVE PATH CHANGED");
         }
     }
     #endregion
 
     #region Commands
+    private RelayCommand? _loadHtml;
+    public RelayCommand LoadHtml => _loadHtml ??= new RelayCommand(LoadHtml_Execute);
+    private async void LoadHtml_Execute(object? parameter)
+    {
+        bool isControlPressed = (bool)parameter!;
+
+        if (Url == null)
+            return;
+
+        await TrySetHtml(Url);
+        HtmlParse.Execute(isControlPressed);
+    }
 
     private RelayCommand? _htmlParse;
     public RelayCommand HtmlParse => _htmlParse ??= new RelayCommand(HtmlParse_Execute);
-
     private void HtmlParse_Execute(object? parameter)
     {
-        bool isFastFilling = parameter != null && (bool)parameter;
+        bool noShowWindow = (parameter as bool?) ?? false;
 
-        if (!isFastFilling && ViewProvider.GetWindow(_htmlParserVM).ShowDialog() != true || !_htmlParserVM.IsValid)
-            return;
-
-        List<string>? rawElements = _htmlParserVM.ParseElements();
-        if (rawElements == null)
-            return;
+        if (!noShowWindow)
+        {
+            var tempViewModel = _htmlParserViewModel.Clone();
+            if (ViewProvider.GetWindow(tempViewModel).ShowDialog() != true)
+                return;
+            _htmlParserViewModel = tempViewModel;
+        }
+        else
+        {
+            if (!_htmlParserViewModel.Ok.CanExecute(null))
+                return;
+            _htmlParserViewModel.Ok.Execute(null);
+        }
 
         Items.Clear();
         FailedItems.Clear();
-        foreach (var raw in rawElements)
+
+        if (_htmlParserViewModel.Result == null)
+            return;
+
+        foreach (var raw in _htmlParserViewModel.Result)
         {
             var uri = BuildItemUrl(raw);
             if (uri != null)
@@ -84,7 +105,6 @@ internal class CollectionVM : ViewModelBase
 
     private RelayCommand? _ok;
     public RelayCommand Ok => _ok ??= new RelayCommand(Ok_Execute, Ok_CanExecute);
-
     private bool Ok_CanExecute(object? _) =>
         !string.IsNullOrWhiteSpace(Name)  // TODO: Check file forbidden chars
         && !string.IsNullOrWhiteSpace(SavePath)  // TODO: Check path exists
@@ -96,11 +116,9 @@ internal class CollectionVM : ViewModelBase
     }
     #endregion
 
-    public CollectionVM()
+    public CollectionViewModel()
     {
         _savePath = _appConfig.SavePathSuggest;
-        _htmlParserVM.XPath = _appConfig.XPathLastSuggest;
-        _htmlParserVM.XPathList = _appConfig.XPathSuggestsList;
 
         Items.CollectionChanged += (s, e) => Ok.OnCanExecuteChanged();
     }
@@ -112,7 +130,7 @@ internal class CollectionVM : ViewModelBase
         try
         {
             var downloader = ServiceAccessor.GetRequiredService<IDownloader>();
-            _htmlParserVM.Html = await downloader.GetHtml(uri, CancellationToken.None);
+            _htmlParserViewModel.Html = await downloader.GetHtml(uri, CancellationToken.None);
         }
         catch (Exception ex)
         {
@@ -144,6 +162,5 @@ internal class CollectionVM : ViewModelBase
     private void UpdateSuggests()
     {
         _appConfig.SavePathSuggest = SavePath;
-        _appConfig.AddXPathSuggest(_htmlParserVM.XPath);
     }
 }

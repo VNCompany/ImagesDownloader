@@ -21,7 +21,7 @@ static class ViewProvider
     // MAPPING FROM VIEWMODEL TYPE TO WINDOW TYPE
     private static Dictionary<Type, Type> _mappings = new()
     {
-        [typeof(HtmlParserVM)] = typeof(HtmlParserWindow)
+        [typeof(HtmlParserViewModel)] = typeof(HtmlParserWindow)
     };
 
     public static void ShowMessage(string caption, string message)

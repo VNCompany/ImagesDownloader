@@ -24,18 +24,11 @@ namespace ImagesDownloader.Views
         {
             if (e.Key == Key.Enter)
             {
-                var parameter = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
-                var vm = (DataContext as CollectionVM) ?? throw new InvalidCastException();
+                var vm = (DataContext as CollectionViewModel) ?? throw new InvalidCastException();
                 tbUrl.GetBindingExpression(TextBox.TextProperty).UpdateSource();
-                
-                vm.TrySetHtml(vm.Url).ContinueWith(t =>
-                {
-                    Dispatcher.Invoke(() =>
-                    {
-                        if (vm.HtmlParse.CanExecute(parameter))
-                            vm.HtmlParse.Execute(parameter);
-                    });
-                });
+                bool isControlPressed = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
+                if (vm.LoadHtml.CanExecute(isControlPressed))
+                    vm.LoadHtml.Execute(isControlPressed);
             }
         }
     }

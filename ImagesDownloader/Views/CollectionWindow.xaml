@@ -25,7 +25,7 @@
     </Window.Resources>
 
     <Window.DataContext>
-        <vm:CollectionVM></vm:CollectionVM>
+        <vm:CollectionViewModel></vm:CollectionViewModel>
     </Window.DataContext>
     
     <Grid Margin="3">
@@ -71,10 +71,14 @@
             </Grid.ColumnDefinitions>
 
             <TextBlock>Items*:</TextBlock>
-            <ListBox Grid.Row="1" Margin="0,0,2,0" ItemsSource="{Binding Items}" />
+            <ListBox Grid.Row="1" Margin="0,0,2,0" 
+                     ItemsSource="{Binding Items}"
+                     d:ItemsSource="{d:SampleData ItemCount=10}" />
             
             <TextBlock Grid.Column="1">Failed:</TextBlock>
-            <ListBox Grid.Column="1" Grid.Row="1" Margin="2,0,0,0" ItemsSource="{Binding FailedItems}"/>
+            <ListBox Grid.Column="1" Grid.Row="1" Margin="2,0,0,0" Foreground="Red"
+                     ItemsSource="{Binding FailedItems}"
+                     d:ItemsSource="{d:SampleData ItemCount=10}" />
 
             <Button Grid.Column="1" Grid.Row="2" Margin="0,5,0,0" IsEnabled="False">Copy to clipboard</Button>
         </Grid> <!-- Lists -->

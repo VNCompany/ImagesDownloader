@@ -21,7 +21,7 @@
     </Window.Resources>
 
     <Window.DataContext>
-        <vm:HtmlParserVM></vm:HtmlParserVM>
+        <vm:HtmlParserViewModel></vm:HtmlParserViewModel>
     </Window.DataContext>
 
     <Grid Margin="3">
@@ -48,7 +48,8 @@
                   Text="{Binding XPath, UpdateSourceTrigger=PropertyChanged}" />
 
         <WrapPanel Grid.Row="4" HorizontalAlignment="Right" Margin="0,10,0,0">
-            <Button Width="100" Margin="0,0,2,0" IsDefault="True" IsEnabled="{Binding IsValid}" Click="Ok_Click">Ok</Button>
+            <Button Width="100" Margin="0,0,2,0" IsDefault="True" 
+                    Click="Ok_Click" Command="{Binding Ok}">Ok</Button>
             <Button Width="100" Margin="2,0,0,0" IsCancel="True">Cancel</Button>
         </WrapPanel>
     </Grid>
